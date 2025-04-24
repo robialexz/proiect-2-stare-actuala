@@ -270,6 +270,7 @@ export function AppRoutes() {
         <Route path="os-report" element={<OSReportPage />} />
         <Route path="desktop-info" element={<DesktopInfoPage />} />
         <Route path="system-health" element={<ErrorMonitoringPage />} />
+        <Route path="analytics" element={<AnalyticsPage />} />
       </Route>
       {/* Add tempobook route to prevent catchall from capturing it */}
       {import.meta.env.VITE_TEMPO === "true" && <Route path="/tempobook/*" />}
