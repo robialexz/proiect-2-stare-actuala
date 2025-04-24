@@ -1,327 +1,470 @@
-import React from 'react';
-import { Tender, TenderSort } from '@/models/tender';
-import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
-import { ro } from 'date-fns/locale';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Tender, TenderSort, TenderPagination } from "@/models/tender";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  MoreHorizontal, 
-  Eye, 
-  Star, 
-  StarOff, 
-  ArrowUpDown, 
-  ArrowUp, 
-  ArrowDown,
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  ArrowUpDown,
+  Calendar,
+  Building,
+  MapPin,
+  Tag,
+  Star,
+  StarOff,
+  CheckCircle,
+  XCircle,
   FileText,
-  Bell,
-  BellOff,
-  ThumbsUp,
-  ThumbsDown,
-  ExternalLink
-} from 'lucide-react';
+  ExternalLink,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { formatCurrency, formatDate } from "@/lib/utils";
+import TenderDetailsDialog from "./TenderDetailsDialog";
 
 interface TendersListProps {
   tenders: Tender[];
-  onViewTender: (tender: Tender) => void;
-  onToggleFavorite: (tender: Tender, isFavorite: boolean) => void;
-  onToggleRelevant: (tender: Tender, isRelevant: boolean) => void;
-  onSubscribe: (tender: Tender) => void;
-  onUnsubscribe: (tender: Tender) => void;
-  onOpenExternal: (tender: Tender) => void;
-  onSort: (sort: TenderSort) => void;
-  currentSort: TenderSort;
-  loading: boolean;
+  pagination: TenderPagination;
+  onPaginationChange: (pagination: TenderPagination) => void;
+  sort: TenderSort;
+  onSortChange: (sort: TenderSort) => void;
 }
 
-const TendersList: React.FC<TendersListProps> = ({
+/**
+ * Componenta pentru afișarea listei de licitații
+ */
+export default function TendersList({
   tenders,
-  onViewTender,
-  onToggleFavorite,
-  onToggleRelevant,
-  onSubscribe,
-  onUnsubscribe,
-  onOpenExternal,
-  onSort,
-  currentSort,
-  loading
-}) => {
+  pagination,
+  onPaginationChange,
+  sort,
+  onSortChange,
+}: TendersListProps) {
   const { t } = useTranslation();
-  
-  // Funcție pentru a gestiona sortarea
-  const handleSort = (field: string) => {
-    if (currentSort.field === field) {
-      onSort({
+  const [selectedTender, setSelectedTender] = useState<Tender | null>(null);
+
+  /**
+   * Schimbă sortarea
+   */
+  const handleSortChange = (field: string) => {
+    if (sort.field === field) {
+      // Dacă este același câmp, schimbăm direcția
+      onSortChange({
         field,
-        direction: currentSort.direction === 'asc' ? 'desc' : 'asc'
+        direction: sort.direction === "asc" ? "desc" : "asc",
       });
     } else {
-      onSort({
+      // Dacă este un câmp nou, setăm direcția implicită
+      onSortChange({
         field,
-        direction: 'asc'
+        direction: "desc",
       });
     }
   };
-  
-  // Funcție pentru a afișa iconița de sortare
-  const getSortIcon = (field: string) => {
-    if (currentSort.field !== field) {
-      return <ArrowUpDown className="ml-2 h-4 w-4" />;
+
+  /**
+   * Schimbă pagina
+   */
+  const handlePageChange = (page: number) => {
+    onPaginationChange({
+      ...pagination,
+      page,
+    });
+  };
+
+  /**
+   * Schimbă numărul de elemente pe pagină
+   */
+  const handlePageSizeChange = (pageSize: number) => {
+    onPaginationChange({
+      ...pagination,
+      pageSize,
+      page: 1, // Resetăm pagina la 1 când schimbăm numărul de elemente pe pagină
+    });
+  };
+
+  /**
+   * Calculează numărul total de pagini
+   */
+  const totalPages = Math.ceil(pagination.total / pagination.pageSize);
+
+  /**
+   * Generează paginile care trebuie afișate
+   */
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      // Dacă avem mai puține pagini decât maxim, le afișăm pe toate
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Altfel, afișăm prima pagină, ultima pagină și paginile din jurul paginii curente
+      pages.push(1);
+
+      let startPage = Math.max(2, pagination.page - 1);
+      let endPage = Math.min(totalPages - 1, pagination.page + 1);
+
+      if (startPage > 2) {
+        pages.push("ellipsis-start");
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      if (endPage < totalPages - 1) {
+        pages.push("ellipsis-end");
+      }
+
+      pages.push(totalPages);
     }
-    
-    return currentSort.direction === 'asc' 
-      ? <ArrowUp className="ml-2 h-4 w-4" />
-      : <ArrowDown className="ml-2 h-4 w-4" />;
+
+    return pages;
   };
-  
-  // Funcție pentru a formata data
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'PPP', { locale: ro });
-  };
-  
-  // Funcție pentru a obține culoarea badge-ului în funcție de status
-  const getStatusBadgeColor = (status: string) => {
+
+  /**
+   * Obține clasa CSS pentru badge-ul de status
+   */
+  const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'closed':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'awarded':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'draft':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+      case "active":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100";
+      case "closed":
+        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100";
+      case "awarded":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100";
+      case "cancelled":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100";
+      case "draft":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "";
     }
   };
-  
-  // Funcție pentru a formata valoarea estimată
-  const formatValue = (value?: number, currency?: string) => {
-    if (value === undefined) return t('tenders.noValue', 'No value');
-    
-    return new Intl.NumberFormat('ro-RO', {
-      style: 'currency',
-      currency: currency || 'RON',
-      maximumFractionDigits: 0
-    }).format(value);
+
+  /**
+   * Obține iconul pentru badge-ul de status
+   */
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "active":
+        return <CheckCircle className="h-3 w-3 mr-1" />;
+      case "closed":
+        return <XCircle className="h-3 w-3 mr-1" />;
+      case "awarded":
+        return <CheckCircle className="h-3 w-3 mr-1" />;
+      case "cancelled":
+        return <XCircle className="h-3 w-3 mr-1" />;
+      case "draft":
+        return <FileText className="h-3 w-3 mr-1" />;
+      default:
+        return null;
+    }
   };
 
   return (
-    <div className="rounded-md border">
-      <ScrollArea className="h-[600px]">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[30px]"></TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort('title')}
-              >
-                <div className="flex items-center">
-                  {t('tenders.list.title', 'Title')}
-                  {getSortIcon('title')}
-                </div>
-              </TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort('contracting_authority')}
-              >
-                <div className="flex items-center">
-                  {t('tenders.list.authority', 'Authority')}
-                  {getSortIcon('contracting_authority')}
-                </div>
-              </TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort('publication_date')}
-              >
-                <div className="flex items-center">
-                  {t('tenders.list.publicationDate', 'Publication Date')}
-                  {getSortIcon('publication_date')}
-                </div>
-              </TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort('closing_date')}
-              >
-                <div className="flex items-center">
-                  {t('tenders.list.closingDate', 'Closing Date')}
-                  {getSortIcon('closing_date')}
-                </div>
-              </TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort('estimated_value')}
-              >
-                <div className="flex items-center">
-                  {t('tenders.list.value', 'Value')}
-                  {getSortIcon('estimated_value')}
-                </div>
-              </TableHead>
-              <TableHead 
-                className="cursor-pointer"
-                onClick={() => handleSort('status')}
-              >
-                <div className="flex items-center">
-                  {t('tenders.list.status', 'Status')}
-                  {getSortIcon('status')}
-                </div>
-              </TableHead>
-              <TableHead className="text-right">
-                {t('tenders.list.actions', 'Actions')}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
-                  <div className="flex flex-col items-center">
-                    <div className="relative">
-                      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      <div className="absolute inset-0 border-2 border-primary/20 rounded-full"></div>
-                    </div>
-                    <p className="mt-2 text-sm text-gray-500">
-                      {t('tenders.list.loading', 'Loading tenders...')}
-                    </p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : tenders.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
-                  {t('tenders.list.noTenders', 'No tenders found.')}
-                </TableCell>
-              </TableRow>
-            ) : (
-              tenders.map((tender) => (
-                <TableRow key={tender.id}>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onToggleFavorite(tender, !tender.is_favorite)}
-                      className={tender.is_favorite ? 'text-yellow-500' : ''}
-                    >
-                      {tender.is_favorite ? (
-                        <Star className="h-4 w-4" />
-                      ) : (
-                        <StarOff className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center">
-                      {tender.title}
-                      {tender.is_relevant && (
-                        <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 border-blue-200">
-                          {t('tenders.list.relevant', 'Relevant')}
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {tender.reference_number}
-                    </p>
-                  </TableCell>
-                  <TableCell>{tender.contracting_authority}</TableCell>
-                  <TableCell>{formatDate(tender.publication_date)}</TableCell>
-                  <TableCell>{formatDate(tender.closing_date)}</TableCell>
-                  <TableCell>{formatValue(tender.estimated_value, tender.currency)}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={getStatusBadgeColor(tender.status)}>
-                      {t(`tenders.status.${tender.status}`, tender.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">{t('tenders.list.openMenu', 'Open menu')}</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>{t('tenders.list.actions', 'Actions')}</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => onViewTender(tender)}>
-                          <Eye className="h-4 w-4 mr-2" />
-                          {t('tenders.list.viewDetails', 'View Details')}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onOpenExternal(tender)}>
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          {t('tenders.list.openExternal', 'Open in SEAP')}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => onToggleFavorite(tender, !tender.is_favorite)}>
-                          {tender.is_favorite ? (
-                            <>
-                              <StarOff className="h-4 w-4 mr-2" />
-                              {t('tenders.list.removeFromFavorites', 'Remove from Favorites')}
-                            </>
-                          ) : (
-                            <>
-                              <Star className="h-4 w-4 mr-2" />
-                              {t('tenders.list.addToFavorites', 'Add to Favorites')}
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onToggleRelevant(tender, !tender.is_relevant)}>
-                          {tender.is_relevant ? (
-                            <>
-                              <ThumbsDown className="h-4 w-4 mr-2" />
-                              {t('tenders.list.markAsIrrelevant', 'Mark as Irrelevant')}
-                            </>
-                          ) : (
-                            <>
-                              <ThumbsUp className="h-4 w-4 mr-2" />
-                              {t('tenders.list.markAsRelevant', 'Mark as Relevant')}
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => tender.is_favorite ? onUnsubscribe(tender) : onSubscribe(tender)}>
-                          {tender.is_favorite ? (
-                            <>
-                              <BellOff className="h-4 w-4 mr-2" />
-                              {t('tenders.list.unsubscribe', 'Unsubscribe')}
-                            </>
-                          ) : (
-                            <>
-                              <Bell className="h-4 w-4 mr-2" />
-                              {t('tenders.list.subscribe', 'Subscribe')}
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </ScrollArea>
-    </div>
-  );
-};
+    <>
+      <Card>
+        <div className="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 className="text-lg font-medium">
+              {t("tenders.list.title", "Licitații")}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {t(
+                "tenders.list.showing",
+                "Afișare {{start}} - {{end}} din {{total}} licitații",
+                {
+                  start: Math.min(
+                    (pagination.page - 1) * pagination.pageSize + 1,
+                    pagination.total
+                  ),
+                  end: Math.min(
+                    pagination.page * pagination.pageSize,
+                    pagination.total
+                  ),
+                  total: pagination.total,
+                }
+              )}
+            </p>
+          </div>
 
-export default TendersList;
+          <div className="flex items-center gap-2">
+            <Select
+              value={sort.field}
+              onValueChange={(value) => handleSortChange(value)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue
+                  placeholder={t("tenders.list.sortBy", "Sortează după")}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="publication_date">
+                  {t("tenders.list.sortByPublicationDate", "Dată publicare")}
+                </SelectItem>
+                <SelectItem value="closing_date">
+                  {t("tenders.list.sortByClosingDate", "Dată închidere")}
+                </SelectItem>
+                <SelectItem value="estimated_value">
+                  {t("tenders.list.sortByValue", "Valoare estimată")}
+                </SelectItem>
+                <SelectItem value="title">
+                  {t("tenders.list.sortByTitle", "Titlu")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                handleSortChange(sort.field)
+              }
+              title={
+                sort.direction === "asc"
+                  ? t("tenders.list.sortAscending", "Crescător")
+                  : t("tenders.list.sortDescending", "Descrescător")
+              }
+            >
+              <ArrowUpDown className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        <CardContent className="p-0">
+          {tenders.length === 0 ? (
+            <div className="p-8 text-center">
+              <p className="text-muted-foreground">
+                {t("tenders.list.noTenders", "Nu există licitații disponibile")}
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y">
+              {tenders.map((tender) => (
+                <div
+                  key={tender.id}
+                  className="p-4 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-start justify-between">
+                        <h4
+                          className="text-lg font-medium hover:text-primary cursor-pointer"
+                          onClick={() => setSelectedTender(tender)}
+                        >
+                          {tender.title}
+                        </h4>
+                        <div className="flex items-center gap-2 ml-2">
+                          <Badge
+                            className={`flex items-center ${getStatusBadgeClass(
+                              tender.status
+                            )}`}
+                          >
+                            {getStatusIcon(tender.status)}
+                            {t(
+                              `tenders.status.${tender.status}`,
+                              tender.status
+                            )}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {tender.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          {t("tenders.list.published", "Publicat")}: {formatDate(tender.publication_date)}
+                        </div>
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          {t("tenders.list.closing", "Închidere")}: {formatDate(tender.closing_date)}
+                        </div>
+                        {tender.estimated_value && (
+                          <div className="flex items-center">
+                            <Tag className="h-4 w-4 mr-1" />
+                            {formatCurrency(
+                              tender.estimated_value,
+                              tender.currency || "RON"
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                        <div className="flex items-center">
+                          <Building className="h-4 w-4 mr-1" />
+                          {tender.contracting_authority}
+                          {tender.authority_type && (
+                            <span className="ml-1 text-xs">
+                              ({tender.authority_type})
+                            </span>
+                          )}
+                        </div>
+                        {tender.location && (
+                          <div className="flex items-center">
+                            <MapPin className="h-4 w-4 mr-1" />
+                            {tender.location}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row md:flex-col items-center md:items-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => setSelectedTender(tender)}
+                      >
+                        {t("tenders.list.viewDetails", "Vezi detalii")}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={tender.is_favorite ? "text-yellow-500" : ""}
+                        title={
+                          tender.is_favorite
+                            ? t(
+                                "tenders.list.removeFromFavorites",
+                                "Elimină de la favorite"
+                              )
+                            : t(
+                                "tenders.list.addToFavorites",
+                                "Adaugă la favorite"
+                              )
+                        }
+                      >
+                        {tender.is_favorite ? (
+                          <Star className="h-5 w-5 fill-current" />
+                        ) : (
+                          <Star className="h-5 w-5" />
+                        )}
+                      </Button>
+                      {tender.url && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          title={t(
+                            "tenders.list.openExternalLink",
+                            "Deschide link extern"
+                          )}
+                        >
+                          <a
+                            href={tender.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-5 w-5" />
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+
+        <CardFooter className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {t("tenders.list.itemsPerPage", "Elemente pe pagină")}:
+            </span>
+            <Select
+              value={pagination.pageSize.toString()}
+              onValueChange={(value) => handlePageSizeChange(Number(value))}
+            >
+              <SelectTrigger className="w-[70px]">
+                <SelectValue placeholder={pagination.pageSize.toString()} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                  isActive={pagination.page > 1}
+                  className={
+                    pagination.page <= 1 ? "pointer-events-none opacity-50" : ""
+                  }
+                />
+              </PaginationItem>
+
+              {getPageNumbers().map((page, index) => {
+                if (page === "ellipsis-start" || page === "ellipsis-end") {
+                  return (
+                    <PaginationItem key={`ellipsis-${index}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  );
+                }
+
+                return (
+                  <PaginationItem key={`page-${page}`}>
+                    <PaginationLink
+                      isActive={pagination.page === page}
+                      onClick={() => handlePageChange(page as number)}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                  isActive={pagination.page < totalPages}
+                  className={
+                    pagination.page >= totalPages
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </CardFooter>
+      </Card>
+
+      {selectedTender && (
+        <TenderDetailsDialog
+          tender={selectedTender}
+          open={!!selectedTender}
+          onClose={() => setSelectedTender(null)}
+        />
+      )}
+    </>
+  );
+}
