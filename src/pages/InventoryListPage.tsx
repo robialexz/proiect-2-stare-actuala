@@ -8,14 +8,15 @@ const InventoryListPage: React.FC = () => {
   const fetchItems = async () => {
     setLoading(true);
     try {
-    const res = await supabaseService.select<any[]>("resources", "*");
+      const res = await supabaseService.select<any[]>("resources", "*");
+      if (res.error) {
+        // Removed console statement
+      } else {
+        setItems(res.data || []);
+      }
     } catch (error) {
       // Handle error appropriately
-    }
-    if (res.error) {
-      // Removed console statement
-    } else {
-      setItems(res.data || []);
+      console.error("Error fetching inventory items:", error);
     }
     setLoading(false);
   };
