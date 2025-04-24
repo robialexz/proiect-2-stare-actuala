@@ -73,7 +73,8 @@ const InventarCompaniePage: React.FC = () => {
   const [materials, setMaterials] = useState<MaterialWithProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMaterial, setSelectedMaterial] = useState<MaterialWithProject | null>(null);
+  const [selectedMaterial, setSelectedMaterial] =
+    useState<MaterialWithProject | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [sortColumn, setSortColumn] = useState<string>("name");
@@ -84,24 +85,22 @@ const InventarCompaniePage: React.FC = () => {
     const fetchMaterials = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("materials")
-          .select(`
-            id, 
-            name, 
-            dimension, 
-            unit, 
-            quantity, 
-            manufacturer, 
-            category, 
-            image_url, 
-            suplimentar, 
-            project_id, 
-            cost_per_unit, 
-            supplier_id, 
-            min_stock_level, 
-            max_stock_level, 
-            location, 
+        const { data, error } = await supabase.from("materials").select(`
+            id,
+            name,
+            dimension,
+            unit,
+            quantity,
+            manufacturer,
+            category,
+            image_url,
+            suplimentar,
+            project_id,
+            cost_per_unit,
+            supplier_id,
+            min_stock_level,
+            max_stock_level,
+            location,
             notes,
             created_at,
             updated_at,
@@ -116,10 +115,13 @@ const InventarCompaniePage: React.FC = () => {
         }
 
         // Transform data to include project name
-        const transformedData = data.map((item) => ({
-          ...item,
-          project_name: item.projects?.name || null,
-        }));
+        const transformedData = data.map((item: any) => {
+          const { projects, ...rest } = item;
+          return {
+            ...rest,
+            project_name: projects?.name || null,
+          };
+        });
 
         setMaterials(transformedData);
       } catch (error) {
@@ -166,8 +168,10 @@ const InventarCompaniePage: React.FC = () => {
       const bValue = b[sortColumn as keyof MaterialWithProject];
 
       // Handle null/undefined values
-      if (aValue === null || aValue === undefined) return sortDirection === "asc" ? -1 : 1;
-      if (bValue === null || bValue === undefined) return sortDirection === "asc" ? 1 : -1;
+      if (aValue === null || aValue === undefined)
+        return sortDirection === "asc" ? -1 : 1;
+      if (bValue === null || bValue === undefined)
+        return sortDirection === "asc" ? 1 : -1;
 
       // Compare based on type
       if (typeof aValue === "string" && typeof bValue === "string") {
@@ -194,7 +198,7 @@ const InventarCompaniePage: React.FC = () => {
       // In a real implementation, you would use a library like exceljs
       // For now, we'll just simulate the export
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       toast({
         title: "Export realizat cu succes",
         description: "Datele au fost exportate în format Excel.",
@@ -255,10 +259,7 @@ const InventarCompaniePage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Inventar Companie</h1>
-        <Button
-          onClick={() => navigate("/inventar-proiect")}
-          variant="outline"
-        >
+        <Button onClick={() => navigate("/inventar-proiect")} variant="outline">
           Vezi Inventar Proiect
         </Button>
       </div>
@@ -310,7 +311,10 @@ const InventarCompaniePage: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead onClick={() => handleSort("name")} className="cursor-pointer">
+                  <TableHead
+                    onClick={() => handleSort("name")}
+                    className="cursor-pointer"
+                  >
                     <div className="flex items-center">
                       Nume
                       {sortColumn === "name" && (
@@ -318,7 +322,10 @@ const InventarCompaniePage: React.FC = () => {
                       )}
                     </div>
                   </TableHead>
-                  <TableHead onClick={() => handleSort("category")} className="cursor-pointer">
+                  <TableHead
+                    onClick={() => handleSort("category")}
+                    className="cursor-pointer"
+                  >
                     <div className="flex items-center">
                       Categorie
                       {sortColumn === "category" && (
@@ -326,7 +333,10 @@ const InventarCompaniePage: React.FC = () => {
                       )}
                     </div>
                   </TableHead>
-                  <TableHead onClick={() => handleSort("quantity")} className="cursor-pointer text-right">
+                  <TableHead
+                    onClick={() => handleSort("quantity")}
+                    className="cursor-pointer text-right"
+                  >
                     <div className="flex items-center justify-end">
                       Cantitate
                       {sortColumn === "quantity" && (
@@ -335,7 +345,10 @@ const InventarCompaniePage: React.FC = () => {
                     </div>
                   </TableHead>
                   <TableHead>Unitate</TableHead>
-                  <TableHead onClick={() => handleSort("project_name")} className="cursor-pointer">
+                  <TableHead
+                    onClick={() => handleSort("project_name")}
+                    className="cursor-pointer"
+                  >
                     <div className="flex items-center">
                       Proiect
                       {sortColumn === "project_name" && (
@@ -364,7 +377,9 @@ const InventarCompaniePage: React.FC = () => {
                 ) : (
                   filteredAndSortedMaterials.map((material) => (
                     <TableRow key={material.id}>
-                      <TableCell className="font-medium">{material.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {material.name}
+                      </TableCell>
                       <TableCell>
                         {material.category ? (
                           <Badge variant="outline">{material.category}</Badge>
@@ -375,9 +390,16 @@ const InventarCompaniePage: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <span className={material.quantity <= (material.min_stock_level || 0) ? "text-destructive font-medium" : ""}>
+                        <span
+                          className={
+                            material.quantity <= (material.min_stock_level || 0)
+                              ? "text-destructive font-medium"
+                              : ""
+                          }
+                        >
                           {material.quantity}
-                          {material.quantity <= (material.min_stock_level || 0) && (
+                          {material.quantity <=
+                            (material.min_stock_level || 0) && (
                             <AlertCircle className="inline ml-1 h-4 w-4 text-destructive" />
                           )}
                         </span>
@@ -402,11 +424,17 @@ const InventarCompaniePage: React.FC = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Acțiuni</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => handleViewDetails(material)}>
+                            <DropdownMenuItem
+                              onClick={() => handleViewDetails(material)}
+                            >
                               <Eye className="mr-2 h-4 w-4" />
                               Vezi detalii
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate(`/editeaza-material/${material.id}`)}>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                navigate(`/editeaza-material/${material.id}`)
+                              }
+                            >
                               <Edit className="mr-2 h-4 w-4" />
                               Editează
                             </DropdownMenuItem>
@@ -472,7 +500,9 @@ const InventarCompaniePage: React.FC = () => {
               {selectedMaterial.manufacturer && (
                 <div className="grid grid-cols-4 items-center gap-4">
                   <div className="font-medium">Producător:</div>
-                  <div className="col-span-3">{selectedMaterial.manufacturer}</div>
+                  <div className="col-span-3">
+                    {selectedMaterial.manufacturer}
+                  </div>
                 </div>
               )}
               {selectedMaterial.location && (
@@ -512,11 +542,18 @@ const InventarCompaniePage: React.FC = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowDetailsDialog(false)}
+            >
               Închide
             </Button>
             {selectedMaterial && (
-              <Button onClick={() => navigate(`/editeaza-material/${selectedMaterial.id}`)}>
+              <Button
+                onClick={() =>
+                  navigate(`/editeaza-material/${selectedMaterial.id}`)
+                }
+              >
                 <Edit className="mr-2 h-4 w-4" />
                 Editează
               </Button>

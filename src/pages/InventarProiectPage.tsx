@@ -153,10 +153,13 @@ const InventarProiectPage: React.FC = () => {
         if (materialsError) throw materialsError;
 
         // Transform data to include project name
-        const transformedData = materialsData.map((item) => ({
-          ...item,
-          project_name: item.projects?.name || null,
-        }));
+        const transformedData = materialsData.map((item: any) => {
+          const { projects, ...rest } = item;
+          return {
+            ...rest,
+            project_name: projects?.name || null,
+          };
+        });
 
         setMaterials(transformedData);
       } catch (error) {

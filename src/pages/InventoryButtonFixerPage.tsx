@@ -4,19 +4,28 @@ import { Helmet } from "react-helmet-async";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Wrench, 
-  Bug, 
-  Settings, 
-  ShieldCheck, 
+import {
+  Wrench,
+  Bug,
+  Settings,
+  ShieldCheck,
   FileText,
   RefreshCw,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
-import { AnimatedContainer, AnimatedText } from "@/components/ui/animated-container";
+import {
+  AnimatedContainer,
+  AnimatedText,
+} from "@/components/ui/animated-container";
 import InventoryButtonFixer from "@/components/inventory/InventoryButtonFixer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const InventoryButtonFixerPage: React.FC = () => {
   const { t } = useTranslation();
@@ -24,20 +33,29 @@ const InventoryButtonFixerPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>{t("inventory.buttonFixer.pageTitle", "Reparare butoane inventar")}</title>
+        <title>
+          {t("inventory.buttonFixer.pageTitle", "Reparare butoane inventar")}
+        </title>
       </Helmet>
 
       <div className="container mx-auto py-6 space-y-6">
         <AnimatedContainer animation="slideUp">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <AnimatedText 
-                text={t("inventory.buttonFixer.pageTitle", "Reparare butoane inventar")}
+              <AnimatedText
+                text={t(
+                  "inventory.buttonFixer.pageTitle",
+                  "Reparare butoane inventar"
+                )}
                 tag="h1"
                 className="text-3xl font-bold tracking-tight"
+                children={<></>}
               />
               <p className="text-muted-foreground">
-                {t("inventory.buttonFixer.pageSubtitle", "Scanează și repară problemele cu butoanele din paginile de inventar")}
+                {t(
+                  "inventory.buttonFixer.pageSubtitle",
+                  "Scanează și repară problemele cu butoanele din paginile de inventar"
+                )}
               </p>
             </div>
 
@@ -84,7 +102,10 @@ const InventoryButtonFixerPage: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Bug className="mr-2 h-5 w-5" />
-                    {t("inventory.buttonFixer.diagnostics.title", "Diagnosticare butoane")}
+                    {t(
+                      "inventory.buttonFixer.diagnostics.title",
+                      "Diagnosticare butoane"
+                    )}
                   </CardTitle>
                   <CardDescription>
                     {t(
@@ -100,7 +121,10 @@ const InventoryButtonFixerPage: React.FC = () => {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-sm font-medium text-muted-foreground">
-                              {t("inventory.buttonFixer.diagnostics.totalButtons", "Total butoane")}
+                              {t(
+                                "inventory.buttonFixer.diagnostics.totalButtons",
+                                "Total butoane"
+                              )}
                             </p>
                             <h3 className="text-2xl font-bold">42</h3>
                           </div>
@@ -113,7 +137,10 @@ const InventoryButtonFixerPage: React.FC = () => {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-sm font-medium text-muted-foreground">
-                              {t("inventory.buttonFixer.diagnostics.issuesFound", "Probleme găsite")}
+                              {t(
+                                "inventory.buttonFixer.diagnostics.issuesFound",
+                                "Probleme găsite"
+                              )}
                             </p>
                             <h3 className="text-2xl font-bold">5</h3>
                           </div>
@@ -126,7 +153,10 @@ const InventoryButtonFixerPage: React.FC = () => {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="text-sm font-medium text-muted-foreground">
-                              {t("inventory.buttonFixer.diagnostics.issuesFixed", "Probleme rezolvate")}
+                              {t(
+                                "inventory.buttonFixer.diagnostics.issuesFixed",
+                                "Probleme rezolvate"
+                              )}
                             </p>
                             <h3 className="text-2xl font-bold">3</h3>
                           </div>
@@ -139,7 +169,10 @@ const InventoryButtonFixerPage: React.FC = () => {
                   <div className="flex flex-col items-center justify-center py-8">
                     <RefreshCw className="h-16 w-16 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-medium mb-2">
-                      {t("inventory.buttonFixer.diagnostics.comingSoon", "În curând")}
+                      {t(
+                        "inventory.buttonFixer.diagnostics.comingSoon",
+                        "În curând"
+                      )}
                     </h3>
                     <p className="text-sm text-muted-foreground text-center max-w-md">
                       {t(
@@ -159,7 +192,10 @@ const InventoryButtonFixerPage: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Settings className="mr-2 h-5 w-5" />
-                    {t("inventory.buttonFixer.settings.title", "Setări reparare")}
+                    {t(
+                      "inventory.buttonFixer.settings.title",
+                      "Setări reparare"
+                    )}
                   </CardTitle>
                   <CardDescription>
                     {t(
@@ -172,7 +208,10 @@ const InventoryButtonFixerPage: React.FC = () => {
                   <div className="flex flex-col items-center justify-center py-12">
                     <Settings className="h-16 w-16 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-medium mb-2">
-                      {t("inventory.buttonFixer.settings.comingSoon", "În curând")}
+                      {t(
+                        "inventory.buttonFixer.settings.comingSoon",
+                        "În curând"
+                      )}
                     </h3>
                     <p className="text-sm text-muted-foreground text-center max-w-md">
                       {t(
