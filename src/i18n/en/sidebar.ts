@@ -6,6 +6,7 @@ export const enSidebar = {
   inventoryOverview: "Inventory Overview",
   warehouseInventory: "Warehouse Inventory",
   projectInventory: "Project Inventory",
+  companyInventory: "Company Inventory",
   teams: "Teams",
   suppliers: "Suppliers",
   budget: "Budget",

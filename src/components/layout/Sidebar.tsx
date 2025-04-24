@@ -121,14 +121,14 @@ const Sidebar = () => {
             href: "/inventory-overview",
           },
           {
-            title: t("sidebar.companyInventory", "Company Inventory"),
+            title: t("sidebar.companyInventory", "Inventar Companie"),
             icon: <Warehouse size={20} />,
-            href: "/company-inventory",
+            href: "/inventar-companie",
           },
           {
-            title: t("sidebar.projectInventory", "Project Inventory"),
+            title: t("sidebar.projectInventory", "Inventar Proiect"),
             icon: <Package size={20} />,
-            href: "/project-inventory",
+            href: "/inventar-proiect",
           },
           {
             title: t("sidebar.suppliers"),

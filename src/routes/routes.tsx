@@ -128,14 +128,14 @@ const CalendarPage = createLazyPage(
 );
 
 // ===== GRUPUL INVENTORY =====
-const WarehouseInventoryPage = createLazyPage(
-  () => import("../pages/WarehouseInventoryPage"),
-  "/warehouse-inventory",
+const InventarCompaniePage = createLazyPage(
+  () => import("../pages/InventarCompaniePage"),
+  "/inventar-companie",
   { preload: true }
 );
-const ProjectInventoryPage = createLazyPage(
-  () => import("../pages/ProjectInventoryPage"),
-  "/project-inventory",
+const InventarProiectPage = createLazyPage(
+  () => import("../pages/InventarProiectPage"),
+  "/inventar-proiect",
   { preload: true }
 );
 const InventoryOverviewPage = createLazyPage(
@@ -363,24 +363,25 @@ export function AppRoutes() {
         <Route path="calendar" element={<CalendarPage />} />
 
         {/* Inventory Group */}
-        <Route
-          path="warehouse-inventory"
-          element={<WarehouseInventoryPage />}
-        />
-        <Route path="project-inventory" element={<ProjectInventoryPage />} />
-        <Route
-          path="project-inventory/:projectId"
-          element={<ProjectInventoryPage />}
-        />
+        <Route path="inventar-companie" element={<InventarCompaniePage />} />
+        <Route path="inventar-proiect" element={<InventarProiectPage />} />
         <Route path="inventory-overview" element={<InventoryOverviewPage />} />
         {/* Legacy routes - redirects */}
         <Route
           path="inventory-management"
-          element={<Navigate to="/project-inventory" replace />}
+          element={<Navigate to="/inventar-proiect" replace />}
         />
         <Route
           path="company-inventory"
-          element={<Navigate to="/warehouse-inventory" replace />}
+          element={<Navigate to="/inventar-companie" replace />}
+        />
+        <Route
+          path="warehouse-inventory"
+          element={<Navigate to="/inventar-companie" replace />}
+        />
+        <Route
+          path="project-inventory"
+          element={<Navigate to="/inventar-proiect" replace />}
         />
         <Route path="add-material" element={<AddMaterialPage />} />
         <Route path="upload-excel" element={<UploadExcelPage />} />

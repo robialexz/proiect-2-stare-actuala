@@ -104,7 +104,7 @@ const ModernNavbar = ({
     },
     {
       name: "Inventar",
-      path: "/warehouse-inventory",
+      path: "/inventar-companie",
       icon: <Package size={18} />,
       description: "Administrarea materialelor și stocurilor",
     },
@@ -129,13 +129,13 @@ const ModernNavbar = ({
       icon: <Package size={18} />,
       items: [
         {
-          name: "Inventar Depozit",
-          path: "/warehouse-inventory",
+          name: "Inventar Companie",
+          path: "/inventar-companie",
           icon: <Building2 size={18} />,
         },
         {
           name: "Inventar Proiect",
-          path: "/project-inventory",
+          path: "/inventar-proiect",
           icon: <Package size={18} />,
         },
         {
