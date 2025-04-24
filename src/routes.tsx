@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { lazyPage } from "./lib/lazy-pages";
 
 // Import layout component - preload pentru performanță mai bună
@@ -50,8 +50,8 @@ const InventoryOverviewPage = lazyPage(
   }
 );
 
-const CompanyInventoryPage = lazyPage(
-  () => import("./pages/CompanyInventoryPage"),
+const InventarCompaniePage = lazyPage(
+  () => import("./pages/InventarCompaniePage"),
   {
     preload: true,
     minDisplayTime: 300,
@@ -108,8 +108,8 @@ const CalendarPage = lazyPage(() => import("./pages/CalendarPage"), {
 });
 
 // Pagini pentru inventar și licitații
-const ProjectInventoryPage = lazyPage(
-  () => import("./pages/ProjectInventoryPage"),
+const InventarProiectPage = lazyPage(
+  () => import("./pages/InventarProiectPage"),
   {
     preload: true,
   }
@@ -209,8 +209,16 @@ export function AppRoutes() {
           element={<InventoryManagementPage />}
         />
         <Route path="inventory-overview" element={<InventoryOverviewPage />} />
-        <Route path="company-inventory" element={<CompanyInventoryPage />} />
-        <Route path="project-inventory" element={<ProjectInventoryPage />} />
+        <Route path="inventar-companie" element={<InventarCompaniePage />} />
+        <Route path="inventar-proiect" element={<InventarProiectPage />} />
+        <Route
+          path="company-inventory"
+          element={<Navigate to="/inventar-companie" replace />}
+        />
+        <Route
+          path="project-inventory"
+          element={<Navigate to="/inventar-proiect" replace />}
+        />
         <Route path="tenders" element={<TendersPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="suppliers" element={<SuppliersPage />} />

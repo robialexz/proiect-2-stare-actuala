@@ -148,10 +148,7 @@ const InventoryManagementPage = createLazyPage(
   () => import("../pages/InventoryManagementPage"),
   "/inventory-management"
 );
-const CompanyInventoryPage = createLazyPage(
-  () => import("../pages/CompanyInventoryPage"),
-  "/company-inventory"
-);
+
 const AddMaterialPage = createLazyPage(
   () => import("../pages/AddMaterialPage"),
   "/add-material"

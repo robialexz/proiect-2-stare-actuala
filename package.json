@@ -106,6 +106,7 @@
     "react-router-dom": "^6.23.1",
     "react-window": "^1.8.11",
     "react-world-flags": "^1.6.0",
+    "recharts": "^2.15.3",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.1",
