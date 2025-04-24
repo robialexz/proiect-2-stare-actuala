@@ -1,0 +1,508 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Tema întunecată (implicit) - Modern Dark */
+  :root,
+  [data-theme="dark"] {
+    /* Culori principale */
+    --background: 222 47% 11%; /* slate-900 */
+    --foreground: 0 0% 100%; /* text-white */
+
+    --card: 223 47% 14%; /* slate-800 */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 223 47% 14%; /* slate-800 */
+    --popover-foreground: 0 0% 100%;
+
+    /* Culori primare - Indigo to Blue gradient */
+    --primary: 234 89% 74%; /* indigo-500 */
+    --primary-foreground: 0 0% 100%;
+
+    /* Culori secundare - Cyan */
+    --secondary: 199 89% 48%; /* cyan-500 */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Culori de accent - Purple */
+    --accent: 262 83% 58%; /* purple-500 */
+    --accent-foreground: 0 0% 100%;
+
+    /* Culori de stare */
+    --destructive: 0 70% 50%; /* Roșu pentru erori */
+    --destructive-foreground: 220 20% 98%;
+
+    --success: 142 70% 45%; /* Verde pentru succes */
+    --success-foreground: 220 20% 98%;
+
+    --warning: 38 92% 50%; /* Galben/portocaliu pentru avertizări */
+    --warning-foreground: 220 20% 98%;
+
+    --info: 200 90% 50%; /* Albastru pentru informații */
+    --info-foreground: 220 20% 98%;
+
+    /* Culori de interfață */
+    --muted: 220 15% 20%; /* Fundal pentru elemente secundare */
+    --muted-foreground: 220 10% 70%; /* Text pentru elemente secundare */
+
+    --border: 220 15% 20%; /* Borduri mai vizibile */
+    --input: 220 15% 20%;
+    --ring: 280 75% 60%; /* Ring pentru focus */
+
+    /* Rotunjiri */
+    --radius: 0.5rem;
+
+    /* Umbre */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3),
+      0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3),
+      0 4px 6px -4px rgb(0 0 0 / 0.3);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3),
+      0 8px 10px -6px rgb(0 0 0 / 0.3);
+  }
+
+  /* Tema luminoasă - Modern Light */
+  [data-theme="light"] {
+    /* Culori principale */
+    --background: 0 0% 100%; /* white */
+    --foreground: 222 47% 11%; /* slate-900 */
+
+    --card: 210 40% 98%; /* slate-50 */
+    --card-foreground: 222 47% 11%; /* slate-900 */
+
+    --popover: 0 0% 100%; /* white */
+    --popover-foreground: 222 47% 11%; /* slate-900 */
+
+    /* Culori primare - Indigo to Blue gradient */
+    --primary: 234 89% 54%; /* indigo-500 ajustat pentru tema luminoasă */
+    --primary-foreground: 0 0% 100%;
+
+    /* Culori secundare - Cyan */
+    --secondary: 199 89% 38%; /* cyan-500 ajustat pentru tema luminoasă */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Culori de accent - Purple */
+    --accent: 262 83% 48%; /* purple-500 ajustat pentru tema luminoasă */
+    --accent-foreground: 0 0% 100%;
+
+    /* Culori de stare */
+    --destructive: 0 65% 45%; /* Roșu pentru erori */
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 65% 35%; /* Verde pentru succes */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 87% 40%; /* Galben/portocaliu pentru avertizări */
+    --warning-foreground: 0 0% 100%;
+
+    --info: 200 85% 40%; /* Albastru pentru informații */
+    --info-foreground: 0 0% 100%;
+
+    /* Culori de interfață */
+    --muted: 220 15% 95%; /* Fundal pentru elemente secundare */
+    --muted-foreground: 220 10% 40%; /* Text pentru elemente secundare */
+
+    --border: 220 15% 90%; /* Borduri mai subtile */
+    --input: 220 15% 90%;
+    --ring: 280 70% 45%; /* Ring pentru focus */
+
+    /* Umbre */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+      0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+      0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+}
+
+@layer base {
+  /* Stiluri de bază */
+  * {
+    @apply border-border;
+  }
+
+  /* Stiluri pentru body */
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Stiluri pentru focus */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Stiluri pentru scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full hover:bg-muted/80;
+  }
+
+  /* Tranziții pentru schimbarea temelor */
+  *,
+  *::before,
+  *::after {
+    transition: background-color 0.3s ease, border-color 0.3s ease,
+      color 0.3s ease, fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease,
+      box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  /* Stiluri pentru headings */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl lg:text-5xl;
+  }
+
+  h2 {
+    @apply text-3xl lg:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl lg:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl lg:text-2xl;
+  }
+
+  h5 {
+    @apply text-lg lg:text-xl;
+  }
+
+  h6 {
+    @apply text-base lg:text-lg;
+  }
+
+  /* Stiluri pentru link-uri */
+  a {
+    @apply text-primary hover:text-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+}
+
+@layer components {
+  /* Componente personalizate */
+  .card {
+    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+  }
+
+  .card-header {
+    @apply flex flex-col space-y-1.5 p-6;
+  }
+
+  .card-title {
+    @apply text-2xl font-semibold leading-none tracking-tight;
+  }
+
+  .card-description {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .card-content {
+    @apply p-6 pt-0;
+  }
+
+  .card-footer {
+    @apply flex items-center p-6 pt-0;
+  }
+
+  /* Stiluri pentru butoane */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/90;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-accent-foreground hover:bg-accent/90;
+  }
+
+  .btn-destructive {
+    @apply bg-destructive text-destructive-foreground hover:bg-destructive/90;
+  }
+
+  .btn-outline {
+    @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .btn-link {
+    @apply text-primary underline-offset-4 hover:underline;
+  }
+
+  /* Dimensiuni pentru butoane */
+  .btn-sm {
+    @apply h-9 rounded-md px-3;
+  }
+
+  .btn-default {
+    @apply h-10 px-4 py-2;
+  }
+
+  .btn-lg {
+    @apply h-11 rounded-md px-8;
+  }
+
+  .btn-icon {
+    @apply h-10 w-10;
+  }
+}
+
+@layer utilities {
+  /* Utilități pentru animații */
+  .animate-in {
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: forwards;
+  }
+
+  .fade-in {
+    animation-name: fadeIn;
+  }
+
+  .slide-in-from-top {
+    animation-name: slideInFromTop;
+  }
+
+  .slide-in-from-bottom {
+    animation-name: slideInFromBottom;
+  }
+
+  .slide-in-from-left {
+    animation-name: slideInFromLeft;
+  }
+
+  .slide-in-from-right {
+    animation-name: slideInFromRight;
+  }
+
+  .zoom-in {
+    animation-name: zoomIn;
+  }
+
+  .animate-out {
+    animation-duration: 0.2s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: forwards;
+  }
+
+  .fade-out {
+    animation-name: fadeOut;
+  }
+
+  .slide-out-to-top {
+    animation-name: slideOutToTop;
+  }
+
+  .slide-out-to-bottom {
+    animation-name: slideOutToBottom;
+  }
+
+  .slide-out-to-left {
+    animation-name: slideOutToLeft;
+  }
+
+  .slide-out-to-right {
+    animation-name: slideOutToRight;
+  }
+
+  .zoom-out {
+    animation-name: zoomOut;
+  }
+}
+
+/* Loader animation for Spline component */
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #fff;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+/* Animații keyframes */
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToTop {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToBottom {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(10px);
+    opacity: 0;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomOut {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
