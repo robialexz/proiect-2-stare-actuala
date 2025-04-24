@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TenderFilters as TenderFiltersType, TenderStatus } from "@/models/tender";
+import {
+  TenderFilters as TenderFiltersType,
+  TenderStatus,
+} from "@/models/tender";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -38,10 +41,7 @@ export default function TenderFilters({
   /**
    * Actualizează filtrele locale
    */
-  const updateLocalFilters = (
-    key: keyof TenderFiltersType,
-    value: any
-  ) => {
+  const updateLocalFilters = (key: keyof TenderFiltersType, value: any) => {
     setLocalFilters((prev) => ({
       ...prev,
       [key]: value,
@@ -107,7 +107,7 @@ export default function TenderFilters({
                 />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">
+                <SelectItem value="all">
                   {t("tenders.filters.allStatuses", "Toate statusurile")}
                 </SelectItem>
                 <SelectItem value="active">
@@ -169,9 +169,7 @@ export default function TenderFilters({
           <AccordionContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>
-                  {t("tenders.filters.minValue", "Valoare minimă")}
-                </Label>
+                <Label>{t("tenders.filters.minValue", "Valoare minimă")}</Label>
                 <Input
                   type="number"
                   placeholder="0"
@@ -185,9 +183,7 @@ export default function TenderFilters({
                 />
               </div>
               <div className="space-y-2">
-                <Label>
-                  {t("tenders.filters.maxValue", "Valoare maximă")}
-                </Label>
+                <Label>{t("tenders.filters.maxValue", "Valoare maximă")}</Label>
                 <Input
                   type="number"
                   placeholder="∞"

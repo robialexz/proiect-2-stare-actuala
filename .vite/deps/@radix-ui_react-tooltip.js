@@ -9,7 +9,6 @@ import {
   Root2,
   createPopperScope
 } from "./chunk-KTDU5JH6.js";
-import "./chunk-HUCD5XZ5.js";
 import {
   DismissableLayer,
   Portal
@@ -17,6 +16,7 @@ import {
 import {
   useId
 } from "./chunk-MXM6PSMG.js";
+import "./chunk-HUCD5XZ5.js";
 import {
   Presence
 } from "./chunk-GXJK34EN.js";
