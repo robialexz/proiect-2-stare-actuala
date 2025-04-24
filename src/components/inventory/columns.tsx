@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import React from "react"; // Needed for React.Dispatch
- // Remove import from here
+// Remove import from here
 import { TFunction } from "i18next"; // Import TFunction type
 
 // Define the shape of our data
@@ -29,7 +29,6 @@ export type Material = {
   // Additional fields for managers
   cost_per_unit?: number | null;
   supplier_id?: string | null;
-  last_order_date?: string | null;
   min_stock_level?: number | null;
   max_stock_level?: number | null;
   location?: string | null;
@@ -59,7 +58,7 @@ export const getColumns = ({
   setMaterialToConfirmSuplimentar,
   t, // Destructure t function prop
 }: ColumnsProps): ColumnDef<Material>[] => {
-   // Remove hook call from here
+  // Remove hook call from here
 
   // Define column headers using t()
   const columns: ColumnDef<Material>[] = [
@@ -83,7 +82,7 @@ export const getColumns = ({
             title={
               t(
                 "inventory.actions.adjustTooltip",
-                "Click to adjust supplementary quantity",
+                "Click to adjust supplementary quantity"
               ) || ""
             }
           >
@@ -155,7 +154,9 @@ export const getColumns = ({
         const suplimentar = isNaN(numericValue) ? 0 : numericValue;
         return (
           <div
-            className={`text-right font-medium ${suplimentar > 0 ? "text-yellow-400" : ""}`}
+            className={`text-right font-medium ${
+              suplimentar > 0 ? "text-yellow-400" : ""
+            }`}
           >
             {suplimentar}
           </div>
@@ -249,7 +250,7 @@ export const getColumns = ({
                     >
                       {t(
                         "inventory.actions.confirmSuplimentar",
-                        "Confirm Suplimentar",
+                        "Confirm Suplimentar"
                       )}{" "}
                       ({material.suplimentar})
                     </DropdownMenuItem>

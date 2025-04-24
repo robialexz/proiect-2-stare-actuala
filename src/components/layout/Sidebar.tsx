@@ -105,7 +105,7 @@ const Sidebar = () => {
   // Definim grupurile de navigare - optimizat cu memoizare
   const navGroups: NavGroup[] = useMemo(
     () => [
-      // Am eliminat grupul "Panou Control" conform cerințelor
+      // Am eliminat butonul de dashboard din grupuri, va fi adăugat separat
       {
         title: t("sidebar.managementGroup"),
         icon: <Briefcase size={20} />,
@@ -304,6 +304,36 @@ const Sidebar = () => {
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-4">
         <nav className="px-2 space-y-1">
+          {/* Dashboard button - standalone */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  to="/dashboard"
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors mb-4",
+                    isActive("/dashboard")
+                      ? "bg-slate-800 text-white"
+                      : "text-slate-400 hover:text-white hover:bg-slate-800",
+                    collapsed && "justify-center px-2"
+                  )}
+                >
+                  <LayoutDashboard size={20} />
+                  {!collapsed && (
+                    <span className="ml-3 flex-1">
+                      {t("sidebar.dashboard")}
+                    </span>
+                  )}
+                </Link>
+              </TooltipTrigger>
+              {collapsed && (
+                <TooltipContent side="right">
+                  <p>{t("sidebar.dashboard")}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
+
           {navGroups.map((group) => (
             <div key={group.title} className="mb-4">
               {/* Group header */}
@@ -425,16 +455,6 @@ const Sidebar = () => {
       {/* Footer */}
       <div className="p-4 border-t border-slate-800">
         <div className="space-y-2">
-          {/* Link către pagina de dashboard - adăugat înapoi */}
-          <RoleBasedSidebarItem
-            path="/dashboard"
-            icon={LayoutDashboard}
-            label="Panou Control"
-            translationKey="sidebar.dashboard"
-            allowedRoles={["admin", "manager", "user", "viewer"]}
-            collapsed={collapsed}
-          />
-
           {/* Link către pagina de asistent AI */}
           <RoleBasedSidebarItem
             path="/ai-assistant"

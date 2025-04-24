@@ -14,6 +14,9 @@ export enum SupabaseTables {
   TEAM_MEMBERS = "team_members",
   NOTIFICATIONS = "notifications",
   ERROR_LOGS = "error_logs",
+  SITE_ADMINS = "site_admins",
+  COMPANIES = "companies",
+  USER_ROLES = "user_roles",
 }
 
 /**

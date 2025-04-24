@@ -80,6 +80,13 @@ const CompanyManagementPage = lazyPage(
   }
 );
 
+const CompanyDetailsPage = lazyPage(
+  () => import("./pages/CompanyDetailsPage"),
+  {
+    preload: true,
+  }
+);
+
 const AddCompanyPage = lazyPage(() => import("./pages/AddCompanyPage"), {
   preload: true,
 });
@@ -234,6 +241,8 @@ export function AppRoutes() {
         <Route path="admin" element={<AdminPage />} />
         <Route path="companies" element={<CompanyManagementPage />} />
         <Route path="companies/add" element={<AddCompanyPage />} />
+        <Route path="companies/:id" element={<CompanyDetailsPage />} />
+        <Route path="companies/edit/:id" element={<CompanyDetailsPage />} />
         <Route
           path="companies/:companyId/users"
           element={<CompanyUsersPage />}

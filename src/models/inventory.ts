@@ -10,7 +10,6 @@ export interface Material {
   suplimentar?: number;
   cost_per_unit?: number;
   supplier_id?: string;
-  last_order_date?: string;
   min_stock_level?: number;
   max_stock_level?: number;
   location?: string;
@@ -21,7 +20,7 @@ export interface Material {
   updated_by?: string;
   qr_code?: string;
   barcode?: string;
-  status?: 'active' | 'inactive' | 'pending' | 'archived';
+  status?: "active" | "inactive" | "pending" | "archived";
 }
 
 export interface MaterialWithProject extends Material {
@@ -62,7 +61,7 @@ export interface MaterialMovement {
   to_project_id?: string;
   quantity: number;
   movement_date: string;
-  movement_type: 'transfer' | 'issue' | 'return' | 'adjustment' | 'receipt';
+  movement_type: "transfer" | "issue" | "return" | "adjustment" | "receipt";
   notes?: string;
   created_by: string;
   created_at: string;
@@ -78,7 +77,13 @@ export interface MaterialOrder {
   order_date: string;
   expected_delivery_date?: string;
   actual_delivery_date?: string;
-  status: 'pending' | 'approved' | 'ordered' | 'shipped' | 'delivered' | 'cancelled';
+  status:
+    | "pending"
+    | "approved"
+    | "ordered"
+    | "shipped"
+    | "delivered"
+    | "cancelled";
   notes?: string;
   created_by: string;
   created_at: string;
@@ -114,7 +119,7 @@ export interface InventoryFilters {
 
 export interface InventorySort {
   field: string;
-  direction: 'asc' | 'desc';
+  direction: "asc" | "desc";
 }
 
 export interface InventoryPagination {

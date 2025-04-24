@@ -9,6 +9,31 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      site_admins: {
+        Row: {
+          id: string;
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "site_admins_user_id_fkey";
+            columns: ["user_id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       budgets: {
         Row: {
           amount: number | null;

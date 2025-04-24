@@ -89,6 +89,12 @@ export const roleService = {
         );
       }
 
+      // Dacă utilizatorul este robialexzi0@gmail.com, îi acordăm rolul de SITE_ADMIN
+      if (user && user.user && user.user.email === "robialexzi0@gmail.com") {
+        console.log("RoleService: Admin profile created directly");
+        return UserRoles.SITE_ADMIN;
+      }
+
       // Dacă nu avem nici un rol, returnăm rolul implicit
       console.log("RoleService: No role found, returning default role");
       return UserRoles.ADMIN; // Returnăm ADMIN ca rol implicit pentru a asigura accesul
@@ -235,6 +241,20 @@ export const roleService = {
           "RoleService: Error checking site admin status",
           error instanceof Error ? error.message : String(error)
         );
+      }
+
+      // Dacă utilizatorul este admin, creăm profilul direct
+      if (isAdmin) {
+        console.log("RoleService: Admin profile created directly");
+        const role = UserRoles.SITE_ADMIN;
+        console.log("RoleService: User role", role);
+        console.log("RoleService: User permissions", ROLE_PERMISSIONS[role]);
+        return {
+          displayName: user.email?.split("@")[0] || "Admin",
+          email: user.email || "",
+          role: role,
+          permissions: ROLE_PERMISSIONS[role],
+        };
       }
 
       // Verificăm dacă utilizatorul există în tabelul profiles

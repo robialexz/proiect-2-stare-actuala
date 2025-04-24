@@ -20,6 +20,8 @@ declare namespace Database {
     supplier_announcement_files: any;
     material_orders: any;
     project_order_settings: any;
+    site_admins: any;
+    companies: any;
   }
 }
 
@@ -80,8 +82,8 @@ declare interface Task {
   id?: string;
   title: string;
   description?: string;
-  status: 'todo' | 'in_progress' | 'completed' | 'blocked';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: "todo" | "in_progress" | "completed" | "blocked";
+  priority: "low" | "medium" | "high" | "urgent";
   due_date?: string;
   assigned_to?: string;
   assigned_to_name?: string;

@@ -17,6 +17,10 @@ import { useOnClickOutside as useOnClickOutsideImport } from "./useOnClickOutsid
 import { useAsync as useAsyncImport } from "./useAsync";
 import { useProjects as useProjectsImport } from "./use-projects";
 import { useMaterials as useMaterialsImport } from "./use-materials";
+import { useCompanies as useCompaniesImport } from "./useCompanies";
+import { useCompany as useCompanyImport } from "./useCompany";
+import { useUserCompanies as useUserCompaniesImport } from "./useUserCompanies";
+import { useCompanyInventory as useCompanyInventoryImport } from "./useCompanyInventory";
 
 // Exportăm hook-urile
 export const useLocalStorage = useLocalStorageImport;
@@ -31,6 +35,10 @@ export const useOnClickOutside = useOnClickOutsideImport;
 export const useAsync = useAsyncImport;
 export const useProjects = useProjectsImport;
 export const useMaterials = useMaterialsImport;
+export const useCompanies = useCompaniesImport;
+export const useCompany = useCompanyImport;
+export const useUserCompanies = useUserCompaniesImport;
+export const useCompanyInventory = useCompanyInventoryImport;
 
 // Exportăm tipurile
 export type { AsyncState, AsyncStatus, AsyncOptions } from "./useAsync";
@@ -49,6 +57,10 @@ const hooks = {
   useAsync: useAsyncImport,
   useProjects: useProjectsImport,
   useMaterials: useMaterialsImport,
+  useCompanies: useCompaniesImport,
+  useCompany: useCompanyImport,
+  useUserCompanies: useUserCompaniesImport,
+  useCompanyInventory: useCompanyInventoryImport,
 };
 
 export default hooks;

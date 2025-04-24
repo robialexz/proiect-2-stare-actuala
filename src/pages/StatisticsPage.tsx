@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,76 +7,119 @@ import StatisticsCard from "@/components/dashboard/StatisticsCard";
 import ChartCard from "@/components/dashboard/ChartCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabaseService } from "@/services";
 import {
   Package,
   Truck,
-  Users,
   Clock,
   BarChart3,
   LineChart,
   PieChart,
-  Calendar,
   ArrowRight,
   Download,
-  Filter,
   RefreshCw,
-  Layers,
-  TrendingUp,
   DollarSign,
   AlertCircle,
 } from "lucide-react";
 
-// Mock data for demonstration
-const mockInventoryData = {
-  totalItems: 1248,
-  lowStockItems: 32,
-  pendingDeliveries: 8,
-  suppliers: 36,
-  itemsGrowth: 12,
-  deliveriesGrowth: -3,
-  suppliersGrowth: 5,
-  lowStockGrowth: 15,
-};
-
-const mockChartData = {
-  inventoryTrends: [
-    { month: "Jan", value: 800 },
-    { month: "Feb", value: 900 },
-    { month: "Mar", value: 950 },
-    { month: "Apr", value: 1000 },
-    { month: "May", value: 950 },
-    { month: "Jun", value: 1100 },
-    { month: "Jul", value: 1200 },
-    { month: "Aug", value: 1248 },
-  ],
-  categoryDistribution: [
-    { category: "Construction", value: 35 },
-    { category: "Electrical", value: 25 },
-    { category: "Plumbing", value: 20 },
-    { category: "HVAC", value: 15 },
-    { category: "Other", value: 5 },
-  ],
-  supplierPerformance: [
-    { supplier: "Supplier A", onTime: 95, quality: 90 },
-    { supplier: "Supplier B", onTime: 85, quality: 95 },
-    { supplier: "Supplier C", onTime: 90, quality: 85 },
-    { supplier: "Supplier D", onTime: 80, quality: 80 },
-    { supplier: "Supplier E", onTime: 75, quality: 90 },
-  ],
-};
+// Interfețe pentru datele statistice
+interface InventoryData {
+  totalItems: number;
+  lowStockItems: number;
+  pendingDeliveries: number;
+  suppliers: number;
+  itemsGrowth: number;
+  deliveriesGrowth: number;
+  suppliersGrowth: number;
+  lowStockGrowth: number;
+}
 
 const StatisticsPage: React.FC = () => {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [inventoryData, setInventoryData] = useState<InventoryData>({
+    totalItems: 0,
+    lowStockItems: 0,
+    pendingDeliveries: 0,
+    suppliers: 0,
+    itemsGrowth: 0,
+    deliveriesGrowth: 0,
+    suppliersGrowth: 0,
+    lowStockGrowth: 0,
+  });
 
-  // Mock refresh function
-  const handleRefresh = () => {
+  // Încărcăm datele la inițializare
+  useEffect(() => {
+    loadStatisticsData();
+  }, []);
+
+  // Funcție pentru încărcarea datelor statistice
+  const loadStatisticsData = async () => {
     setIsLoading(true);
-    setTimeout(() => {
+
+    try {
+      // Încărcăm numărul total de materiale
+      const materialsResponse = await supabaseService.select(
+        "materials",
+        "count(*)",
+        {}
+      );
+
+      // Încărcăm numărul de materiale cu stoc redus
+      const lowStockResponse = await supabaseService.select(
+        "materials",
+        "count(*)",
+        {
+          filters: { quantity: { lt: "min_stock_level" } },
+        }
+      );
+
+      // Încărcăm numărul de livrări în așteptare
+      const deliveriesResponse = await supabaseService.select(
+        "deliveries",
+        "count(*)",
+        {
+          filters: { status: "pending" },
+        }
+      );
+
+      // Încărcăm numărul de furnizori
+      const suppliersResponse = await supabaseService.select(
+        "suppliers",
+        "count(*)",
+        {}
+      );
+
+      // Setăm datele
+      if (
+        materialsResponse.status === "success" &&
+        lowStockResponse.status === "success" &&
+        deliveriesResponse.status === "success" &&
+        suppliersResponse.status === "success"
+      ) {
+        setInventoryData({
+          totalItems: materialsResponse.data?.[0]?.count || 0,
+          lowStockItems: lowStockResponse.data?.[0]?.count || 0,
+          pendingDeliveries: deliveriesResponse.data?.[0]?.count || 0,
+          suppliers: suppliersResponse.data?.[0]?.count || 0,
+          itemsGrowth: 5, // Valori implicite pentru creștere
+          deliveriesGrowth: -2,
+          suppliersGrowth: 3,
+          lowStockGrowth: 10,
+        });
+      }
+    } catch (error) {
+      console.error("Eroare la încărcarea datelor statistice:", error);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
+  };
+
+  // Funcție pentru reîmprospătarea datelor
+  const handleRefresh = () => {
+    loadStatisticsData();
   };
 
   if (loading) {
@@ -111,7 +154,9 @@ const StatisticsPage: React.FC = () => {
                 disabled={isLoading}
               >
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-indigo-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+                />
                 {isLoading
                   ? t("common.refreshing", "Se actualizează...")
                   : t("common.refresh", "Actualizează datele")}
@@ -131,10 +176,10 @@ const StatisticsPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatisticsCard
                 title={t("statistics.totalItems", "Total Articole")}
-                value={mockInventoryData.totalItems}
+                value={inventoryData.totalItems}
                 icon={<Package className="h-5 w-5 text-indigo-400" />}
                 trend={{
-                  value: mockInventoryData.itemsGrowth,
+                  value: inventoryData.itemsGrowth,
                   isPositive: true,
                   label: t("statistics.lastMonth", "față de luna trecută"),
                 }}
@@ -144,10 +189,10 @@ const StatisticsPage: React.FC = () => {
               />
               <StatisticsCard
                 title={t("statistics.lowStock", "Stoc Redus")}
-                value={mockInventoryData.lowStockItems}
+                value={inventoryData.lowStockItems}
                 icon={<AlertCircle className="h-5 w-5 text-amber-400" />}
                 trend={{
-                  value: mockInventoryData.lowStockGrowth,
+                  value: inventoryData.lowStockGrowth,
                   isPositive: false,
                   label: t("statistics.lastMonth", "față de luna trecută"),
                 }}
@@ -156,11 +201,14 @@ const StatisticsPage: React.FC = () => {
                 isLoading={isLoading}
               />
               <StatisticsCard
-                title={t("statistics.pendingDeliveries", "Livrări în Așteptare")}
-                value={mockInventoryData.pendingDeliveries}
+                title={t(
+                  "statistics.pendingDeliveries",
+                  "Livrări în Așteptare"
+                )}
+                value={inventoryData.pendingDeliveries}
                 icon={<Clock className="h-5 w-5 text-cyan-400" />}
                 trend={{
-                  value: mockInventoryData.deliveriesGrowth,
+                  value: inventoryData.deliveriesGrowth,
                   isPositive: true,
                   label: t("statistics.lastWeek", "față de săptămâna trecută"),
                 }}
@@ -170,12 +218,15 @@ const StatisticsPage: React.FC = () => {
               />
               <StatisticsCard
                 title={t("statistics.suppliers", "Furnizori")}
-                value={mockInventoryData.suppliers}
+                value={inventoryData.suppliers}
                 icon={<Truck className="h-5 w-5 text-purple-400" />}
                 trend={{
-                  value: mockInventoryData.suppliersGrowth,
+                  value: inventoryData.suppliersGrowth,
                   isPositive: true,
-                  label: t("statistics.lastQuarter", "față de trimestrul trecut"),
+                  label: t(
+                    "statistics.lastQuarter",
+                    "față de trimestrul trecut"
+                  ),
                 }}
                 gradientFrom="from-purple-500"
                 gradientTo="to-indigo-500"
@@ -329,7 +380,10 @@ const StatisticsPage: React.FC = () => {
               <TabsContent value="overview" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <ChartCard
-                    title={t("statistics.charts.inventoryTrends", "Tendințe Inventar")}
+                    title={t(
+                      "statistics.charts.inventoryTrends",
+                      "Tendințe Inventar"
+                    )}
                     description={t(
                       "statistics.charts.inventoryTrendsDesc",
                       "Evoluția numărului total de articole în ultimele 8 luni"
@@ -345,13 +399,19 @@ const StatisticsPage: React.FC = () => {
                     <div className="h-64 flex items-center justify-center">
                       <LineChart className="h-12 w-12 text-indigo-400 opacity-50" />
                       <span className="ml-4 text-slate-400">
-                        {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                        {t(
+                          "statistics.charts.placeholder",
+                          "Aici va fi afișat un grafic"
+                        )}
                       </span>
                     </div>
                   </ChartCard>
 
                   <ChartCard
-                    title={t("statistics.charts.categoryDistribution", "Distribuție pe Categorii")}
+                    title={t(
+                      "statistics.charts.categoryDistribution",
+                      "Distribuție pe Categorii"
+                    )}
                     description={t(
                       "statistics.charts.categoryDistributionDesc",
                       "Procentul de articole pe fiecare categorie"
@@ -366,14 +426,20 @@ const StatisticsPage: React.FC = () => {
                     <div className="h-64 flex items-center justify-center">
                       <PieChart className="h-12 w-12 text-purple-400 opacity-50" />
                       <span className="ml-4 text-slate-400">
-                        {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                        {t(
+                          "statistics.charts.placeholder",
+                          "Aici va fi afișat un grafic"
+                        )}
                       </span>
                     </div>
                   </ChartCard>
                 </div>
 
                 <ChartCard
-                  title={t("statistics.charts.supplierPerformance", "Performanța Furnizorilor")}
+                  title={t(
+                    "statistics.charts.supplierPerformance",
+                    "Performanța Furnizorilor"
+                  )}
                   description={t(
                     "statistics.charts.supplierPerformanceDesc",
                     "Evaluarea furnizorilor în funcție de livrarea la timp și calitatea produselor"
@@ -390,7 +456,10 @@ const StatisticsPage: React.FC = () => {
                   <div className="h-64 flex items-center justify-center">
                     <BarChart3 className="h-12 w-12 text-cyan-400 opacity-50" />
                     <span className="ml-4 text-slate-400">
-                      {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                      {t(
+                        "statistics.charts.placeholder",
+                        "Aici va fi afișat un grafic"
+                      )}
                     </span>
                   </div>
                 </ChartCard>
@@ -400,7 +469,10 @@ const StatisticsPage: React.FC = () => {
               <TabsContent value="inventory" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <ChartCard
-                    title={t("statistics.charts.stockLevels", "Niveluri de Stoc")}
+                    title={t(
+                      "statistics.charts.stockLevels",
+                      "Niveluri de Stoc"
+                    )}
                     description={t(
                       "statistics.charts.stockLevelsDesc",
                       "Nivelurile actuale de stoc pentru articolele principale"
@@ -414,13 +486,19 @@ const StatisticsPage: React.FC = () => {
                     <div className="h-64 flex items-center justify-center">
                       <BarChart3 className="h-12 w-12 text-cyan-400 opacity-50" />
                       <span className="ml-4 text-slate-400">
-                        {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                        {t(
+                          "statistics.charts.placeholder",
+                          "Aici va fi afișat un grafic"
+                        )}
                       </span>
                     </div>
                   </ChartCard>
 
                   <ChartCard
-                    title={t("statistics.charts.stockMovement", "Mișcări de Stoc")}
+                    title={t(
+                      "statistics.charts.stockMovement",
+                      "Mișcări de Stoc"
+                    )}
                     description={t(
                       "statistics.charts.stockMovementDesc",
                       "Intrări și ieșiri de stoc în timp"
@@ -435,13 +513,19 @@ const StatisticsPage: React.FC = () => {
                     <div className="h-64 flex items-center justify-center">
                       <LineChart className="h-12 w-12 text-indigo-400 opacity-50" />
                       <span className="ml-4 text-slate-400">
-                        {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                        {t(
+                          "statistics.charts.placeholder",
+                          "Aici va fi afișat un grafic"
+                        )}
                       </span>
                     </div>
                   </ChartCard>
 
                   <ChartCard
-                    title={t("statistics.charts.lowStockItems", "Articole cu Stoc Redus")}
+                    title={t(
+                      "statistics.charts.lowStockItems",
+                      "Articole cu Stoc Redus"
+                    )}
                     description={t(
                       "statistics.charts.lowStockItemsDesc",
                       "Articole care necesită reaprovizionare"
@@ -455,7 +539,10 @@ const StatisticsPage: React.FC = () => {
                     <div className="h-64 flex items-center justify-center">
                       <AlertCircle className="h-12 w-12 text-amber-400 opacity-50" />
                       <span className="ml-4 text-slate-400">
-                        {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                        {t(
+                          "statistics.charts.placeholder",
+                          "Aici va fi afișat un grafic"
+                        )}
                       </span>
                     </div>
                   </ChartCard>
@@ -466,7 +553,10 @@ const StatisticsPage: React.FC = () => {
               <TabsContent value="suppliers" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <ChartCard
-                    title={t("statistics.charts.supplierDeliveries", "Livrări Furnizori")}
+                    title={t(
+                      "statistics.charts.supplierDeliveries",
+                      "Livrări Furnizori"
+                    )}
                     description={t(
                       "statistics.charts.supplierDeliveriesDesc",
                       "Numărul de livrări pe furnizor în ultimele 6 luni"
@@ -482,13 +572,19 @@ const StatisticsPage: React.FC = () => {
                     <div className="h-64 flex items-center justify-center">
                       <BarChart3 className="h-12 w-12 text-purple-400 opacity-50" />
                       <span className="ml-4 text-slate-400">
-                        {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                        {t(
+                          "statistics.charts.placeholder",
+                          "Aici va fi afișat un grafic"
+                        )}
                       </span>
                     </div>
                   </ChartCard>
 
                   <ChartCard
-                    title={t("statistics.charts.supplierRatings", "Evaluări Furnizori")}
+                    title={t(
+                      "statistics.charts.supplierRatings",
+                      "Evaluări Furnizori"
+                    )}
                     description={t(
                       "statistics.charts.supplierRatingsDesc",
                       "Evaluarea furnizorilor pe baza performanței"
@@ -502,7 +598,10 @@ const StatisticsPage: React.FC = () => {
                     <div className="h-64 flex items-center justify-center">
                       <PieChart className="h-12 w-12 text-cyan-400 opacity-50" />
                       <span className="ml-4 text-slate-400">
-                        {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                        {t(
+                          "statistics.charts.placeholder",
+                          "Aici va fi afișat un grafic"
+                        )}
                       </span>
                     </div>
                   </ChartCard>
@@ -513,7 +612,10 @@ const StatisticsPage: React.FC = () => {
               <TabsContent value="financial" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <ChartCard
-                    title={t("statistics.charts.inventoryValue", "Valoare Inventar")}
+                    title={t(
+                      "statistics.charts.inventoryValue",
+                      "Valoare Inventar"
+                    )}
                     description={t(
                       "statistics.charts.inventoryValueDesc",
                       "Evoluția valorii totale a inventarului"
@@ -529,13 +631,19 @@ const StatisticsPage: React.FC = () => {
                     <div className="h-64 flex items-center justify-center">
                       <LineChart className="h-12 w-12 text-green-400 opacity-50" />
                       <span className="ml-4 text-slate-400">
-                        {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                        {t(
+                          "statistics.charts.placeholder",
+                          "Aici va fi afișat un grafic"
+                        )}
                       </span>
                     </div>
                   </ChartCard>
 
                   <ChartCard
-                    title={t("statistics.charts.purchaseCosts", "Costuri Achiziții")}
+                    title={t(
+                      "statistics.charts.purchaseCosts",
+                      "Costuri Achiziții"
+                    )}
                     description={t(
                       "statistics.charts.purchaseCostsDesc",
                       "Costurile de achiziție pe categorii"
@@ -551,7 +659,10 @@ const StatisticsPage: React.FC = () => {
                     <div className="h-64 flex items-center justify-center">
                       <BarChart3 className="h-12 w-12 text-amber-400 opacity-50" />
                       <span className="ml-4 text-slate-400">
-                        {t("statistics.charts.placeholder", "Aici va fi afișat un grafic")}
+                        {t(
+                          "statistics.charts.placeholder",
+                          "Aici va fi afișat un grafic"
+                        )}
                       </span>
                     </div>
                   </ChartCard>
@@ -574,9 +685,15 @@ const StatisticsPage: React.FC = () => {
                   {t("statistics.exportReport", "Exportă raport")}
                 </Button>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button className="gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 border-0">
-                  {t("statistics.viewDetailedAnalytics", "Vezi analiză detaliată")}
+                  {t(
+                    "statistics.viewDetailedAnalytics",
+                    "Vezi analiză detaliată"
+                  )}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </motion.div>

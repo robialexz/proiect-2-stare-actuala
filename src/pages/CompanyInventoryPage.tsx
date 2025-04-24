@@ -69,7 +69,7 @@ const CompanyInventoryPage: React.FC = () => {
     try {
       const data = await dataLoader.loadData<MaterialWithProject>(
         "materials",
-        "id, name, dimension, unit, quantity, manufacturer, category, image_url, suplimentar, project_id, cost_per_unit, supplier_id, last_order_date, min_stock_level, max_stock_level, location, notes",
+        "id, name, dimension, unit, quantity, manufacturer, category, image_url, suplimentar, project_id, cost_per_unit, supplier_id, min_stock_level, max_stock_level, location, notes",
         {},
         cacheKey,
         30 * 60 * 1000
@@ -81,7 +81,7 @@ const CompanyInventoryPage: React.FC = () => {
         const { data: materialsData, error } = await supabase
           .from("materials")
           .select(
-            "id, name, dimension, unit, quantity, manufacturer, category, image_url, suplimentar, project_id, cost_per_unit, supplier_id, last_order_date, min_stock_level, max_stock_level, location, notes"
+            "id, name, dimension, unit, quantity, manufacturer, category, image_url, suplimentar, project_id, cost_per_unit, supplier_id, min_stock_level, max_stock_level, location, notes"
           );
 
         if (error) throw error;

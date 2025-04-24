@@ -1,9 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './command';
-import { Search, FileText, Package, Users, Calendar, Settings, BarChart, Database, Folder } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./command";
+import {
+  Search,
+  FileText,
+  Package,
+  Users,
+  Calendar,
+  Settings,
+  BarChart,
+  Database,
+  Folder,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+import { supabaseService } from "@/services";
 
 interface SearchResult {
   id: string;
@@ -11,109 +30,122 @@ interface SearchResult {
   description?: string;
   icon: React.ReactNode;
   url: string;
-  category: 'projects' | 'inventory' | 'reports' | 'settings' | 'users';
+  category: "projects" | "inventory" | "reports" | "settings" | "users";
 }
 
 export function GlobalSearch() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Simulăm rezultate de căutare
-  const mockResults: SearchResult[] = [
-    {
-      id: 'project-1',
-      title: 'Proiect Renovare Apartament',
-      description: 'Renovare completă apartament 3 camere',
-      icon: <FileText className="h-4 w-4" />,
-      url: '/projects/1',
-      category: 'projects',
-    },
-    {
-      id: 'project-2',
-      title: 'Construcție Casă',
-      description: 'Construcție casă P+1 cu garaj',
-      icon: <FileText className="h-4 w-4" />,
-      url: '/projects/2',
-      category: 'projects',
-    },
-    {
-      id: 'inventory-1',
-      title: 'Ciment',
-      description: '50 saci, depozit central',
-      icon: <Package className="h-4 w-4" />,
-      url: '/inventory?item=1',
-      category: 'inventory',
-    },
-    {
-      id: 'inventory-2',
-      title: 'Cărămidă',
-      description: '1000 bucăți, depozit central',
-      icon: <Package className="h-4 w-4" />,
-      url: '/inventory?item=2',
-      category: 'inventory',
-    },
-    {
-      id: 'report-1',
-      title: 'Raport Lunar Martie 2023',
-      description: 'Raport financiar lunar',
-      icon: <BarChart className="h-4 w-4" />,
-      url: '/reports/1',
-      category: 'reports',
-    },
-    {
-      id: 'user-1',
-      title: 'Ion Popescu',
-      description: 'Manager proiect',
-      icon: <Users className="h-4 w-4" />,
-      url: '/users/1',
-      category: 'users',
-    },
-    {
-      id: 'settings-1',
-      title: 'Setări Notificări',
-      description: 'Configurare notificări sistem',
-      icon: <Settings className="h-4 w-4" />,
-      url: '/settings/notifications',
-      category: 'settings',
-    },
-  ];
+  // Funcție pentru a căuta în baza de date
+  const searchDatabase = async (query: string): Promise<SearchResult[]> => {
+    if (!query || query.length < 2) return [];
+
+    const results: SearchResult[] = [];
+
+    try {
+      // Căutare proiecte
+      const projectsResponse = await supabaseService.select("projects", "*", {
+        search: query,
+      });
+
+      if (projectsResponse.status === "success" && projectsResponse.data) {
+        const projects = projectsResponse.data;
+        projects.forEach((project: any) => {
+          results.push({
+            id: `project-${project.id}`,
+            title: project.name || "Proiect fără nume",
+            description: project.description || "",
+            icon: <FileText className="h-4 w-4" />,
+            url: `/projects/${project.id}`,
+            category: "projects",
+          });
+        });
+      }
+
+      // Căutare materiale
+      const materialsResponse = await supabaseService.select("materials", "*", {
+        search: query,
+      });
+
+      if (materialsResponse.status === "success" && materialsResponse.data) {
+        const materials = materialsResponse.data;
+        materials.forEach((material: any) => {
+          results.push({
+            id: `inventory-${material.id}`,
+            title: material.name || "Material fără nume",
+            description: `${material.quantity || 0} ${material.unit || "buc"}`,
+            icon: <Package className="h-4 w-4" />,
+            url: `/inventory?item=${material.id}`,
+            category: "inventory",
+          });
+        });
+      }
+
+      // Căutare rapoarte
+      const reportsResponse = await supabaseService.select("reports", "*", {
+        search: query,
+      });
+
+      if (reportsResponse.status === "success" && reportsResponse.data) {
+        const reports = reportsResponse.data;
+        reports.forEach((report: any) => {
+          results.push({
+            id: `report-${report.id}`,
+            title: report.name || "Raport fără nume",
+            description: report.description || "",
+            icon: <BarChart className="h-4 w-4" />,
+            url: `/reports/${report.id}`,
+            category: "reports",
+          });
+        });
+      }
+
+      return results;
+    } catch (error) {
+      console.error("Eroare la căutare:", error);
+      return [];
+    }
+  };
 
   // Deschide dialogul de căutare cu shortcut (Ctrl+K)
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((open) => !open);
       }
     };
 
-    document.addEventListener('keydown', down);
-    return () => document.removeEventListener('keydown', down);
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
   }, []);
 
   // Efectuăm căutarea când se schimbă query-ul
   useEffect(() => {
-    if (!searchQuery) {
+    if (!searchQuery || searchQuery.length < 2) {
       setResults([]);
       return;
     }
 
     setIsLoading(true);
 
-    // Simulăm o întârziere de rețea
-    const timer = setTimeout(() => {
-      const filtered = mockResults.filter(
-        (item) =>
-          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
-      setResults(filtered);
-      setIsLoading(false);
+    // Adăugăm o mică întârziere pentru a evita prea multe cereri
+    const timer = setTimeout(async () => {
+      try {
+        const searchResults = await searchDatabase(searchQuery);
+        setResults(searchResults);
+      } catch (error) {
+        console.error("Eroare la căutare:", error);
+        setResults([]);
+      } finally {
+        setIsLoading(false);
+      }
     }, 300);
 
     return () => clearTimeout(timer);
@@ -126,11 +158,11 @@ export function GlobalSearch() {
   };
 
   // Grupăm rezultatele pe categorii
-  const projectResults = results.filter((r) => r.category === 'projects');
-  const inventoryResults = results.filter((r) => r.category === 'inventory');
-  const reportResults = results.filter((r) => r.category === 'reports');
-  const userResults = results.filter((r) => r.category === 'users');
-  const settingsResults = results.filter((r) => r.category === 'settings');
+  const projectResults = results.filter((r) => r.category === "projects");
+  const inventoryResults = results.filter((r) => r.category === "inventory");
+  const reportResults = results.filter((r) => r.category === "reports");
+  const userResults = results.filter((r) => r.category === "users");
+  const settingsResults = results.filter((r) => r.category === "settings");
 
   return (
     <>
@@ -182,7 +214,9 @@ export function GlobalSearch() {
                         <div className="flex flex-col">
                           <span>{result.title}</span>
                           {result.description && (
-                            <span className="text-xs text-muted-foreground">{result.description}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {result.description}
+                            </span>
                           )}
                         </div>
                       </CommandItem>
@@ -204,7 +238,9 @@ export function GlobalSearch() {
                         <div className="flex flex-col">
                           <span>{result.title}</span>
                           {result.description && (
-                            <span className="text-xs text-muted-foreground">{result.description}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {result.description}
+                            </span>
                           )}
                         </div>
                       </CommandItem>
@@ -226,7 +262,9 @@ export function GlobalSearch() {
                         <div className="flex flex-col">
                           <span>{result.title}</span>
                           {result.description && (
-                            <span className="text-xs text-muted-foreground">{result.description}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {result.description}
+                            </span>
                           )}
                         </div>
                       </CommandItem>
@@ -248,7 +286,9 @@ export function GlobalSearch() {
                         <div className="flex flex-col">
                           <span>{result.title}</span>
                           {result.description && (
-                            <span className="text-xs text-muted-foreground">{result.description}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {result.description}
+                            </span>
                           )}
                         </div>
                       </CommandItem>
@@ -270,7 +310,9 @@ export function GlobalSearch() {
                         <div className="flex flex-col">
                           <span>{result.title}</span>
                           {result.description && (
-                            <span className="text-xs text-muted-foreground">{result.description}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {result.description}
+                            </span>
                           )}
                         </div>
                       </CommandItem>
@@ -281,9 +323,11 @@ export function GlobalSearch() {
                 {searchQuery && results.length > 0 && (
                   <div className="py-2 px-2 text-xs text-muted-foreground border-t">
                     <p>
-                      Apasă <kbd className="px-1 rounded bg-muted">↑</kbd>{' '}
-                      <kbd className="px-1 rounded bg-muted">↓</kbd> pentru a naviga și{' '}
-                      <kbd className="px-1 rounded bg-muted">Enter</kbd> pentru a selecta
+                      Apasă <kbd className="px-1 rounded bg-muted">↑</kbd>{" "}
+                      <kbd className="px-1 rounded bg-muted">↓</kbd> pentru a
+                      naviga și{" "}
+                      <kbd className="px-1 rounded bg-muted">Enter</kbd> pentru
+                      a selecta
                     </p>
                   </div>
                 )}

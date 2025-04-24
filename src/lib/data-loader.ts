@@ -112,11 +112,8 @@ export async function loadData<T>(
           // Removed console statement
         }
 
-        // Dacă suntem în modul de dezvoltare, generam date de test
-        if (import.meta.env.DEV) {
-          // Removed console statement
-          return generateTestData<T>(table, 10);
-        }
+        // Returnăm un array gol dacă nu avem sesiune
+        return [];
       }
     } catch (sessionError) {
       // Removed console statement
@@ -150,10 +147,9 @@ export async function loadData<T>(
             if (retryResponse.status === "success") {
               return (retryResponse.data as T[]) || [];
             }
-          } else if (import.meta.env.DEV) {
-            // În modul de dezvoltare, generam date de test dacă reîmprospătarea eșuează
-            // Removed console statement
-            return generateTestData<T>(table, 10);
+          } else {
+            // Returnăm un array gol dacă reîmprospătarea eșuează
+            return [];
           }
         } catch (refreshError) {
           // Removed console statement
@@ -167,11 +163,8 @@ export async function loadData<T>(
         return offlineData;
       }
 
-      // În modul de dezvoltare, generam date de test ca ultim fallback
-      if (import.meta.env.DEV) {
-        // Removed console statement
-        return generateTestData<T>(table, 10);
-      }
+      // Returnăm un array gol ca ultim fallback
+      return [];
 
       throw new Error(response.error?.message || "Unknown error");
     }
@@ -272,120 +265,10 @@ export function invalidateAllCache(): void {
   // Removed console statement
 }
 
-/**
- * Generează date de test pentru un anumit tabel
- * @param table Numele tabelului
- * @param count Numărul de înregistrări de generat
- * @returns Array de date de test
- */
-function generateTestData<T>(table: string, count: number = 10): T[] {
-  // Removed console statement
-
-  const result: any[] = [];
-
-  for (let i = 0; i < count; i++) {
-    const id = `test-${i}-${Date.now()}`;
-
-    // Generăm date specifice pentru fiecare tip de tabel
-    switch (table) {
-      case "projects":
-        result.push({
-          id,
-          name: `Test Project ${i + 1}`,
-          description: `This is a test project generated for development purposes #${
-            i + 1
-          }`,
-          status: ["planning", "in_progress", "completed", "on_hold"][i % 4],
-          created_at: new Date(Date.now() - i * 86400000).toISOString(),
-          updated_at: new Date().toISOString(),
-          budget: Math.floor(Math.random() * 100000),
-          client_name: `Test Client ${(i % 5) + 1}`,
-          priority: ["low", "medium", "high"][i % 3],
-        });
-        break;
-
-      case "materials":
-        result.push({
-          id,
-          name: `Test Material ${i + 1}`,
-          dimension: `${Math.floor(Math.random() * 100)}x${Math.floor(
-            Math.random() * 100
-          )}`,
-          unit: ["buc", "kg", "m", "m2", "m3"][i % 5],
-          quantity: Math.floor(Math.random() * 1000),
-          manufacturer: `Manufacturer ${(i % 8) + 1}`,
-          category: [
-            "Construction",
-            "Electrical",
-            "Plumbing",
-            "Finishing",
-            "Tools",
-          ][i % 5],
-          image_url: null,
-          suplimentar: i % 3 === 0 ? Math.floor(Math.random() * 50) : 0,
-          project_id: i < 5 ? `test-${i % 3}` : null,
-          project_name: i < 5 ? `Test Project ${(i % 3) + 1}` : null,
-          created_at: new Date(Date.now() - i * 86400000).toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-        break;
-
-      case "resources":
-        result.push({
-          id,
-          name: `Test Resource ${i + 1}`,
-          type: ["Equipment", "Vehicle", "Tool", "Space"][i % 4],
-          description: `Test resource description #${i + 1}`,
-          status: ["available", "in_use", "maintenance", "reserved"][i % 4],
-          location: `Location ${(i % 5) + 1}`,
-          created_at: new Date(Date.now() - i * 86400000).toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-        break;
-
-      case "teams":
-        result.push({
-          id,
-          name: `Test Team ${i + 1}`,
-          description: `This is test team #${i + 1}`,
-          created_at: new Date(Date.now() - i * 86400000).toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-        break;
-
-      case "suppliers":
-        result.push({
-          id,
-          name: `Test Supplier ${i + 1}`,
-          contact_person: `Contact Person ${i + 1}`,
-          email: `supplier${i + 1}@example.com`,
-          phone: `07${Math.floor(Math.random() * 100000000)}`,
-          address: `Test Address ${i + 1}`,
-          created_at: new Date(Date.now() - i * 86400000).toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-        break;
-
-      default:
-        // Date generice pentru orice alt tabel
-        result.push({
-          id,
-          name: `Test Item ${i + 1}`,
-          description: `Test description for ${table} #${i + 1}`,
-          created_at: new Date(Date.now() - i * 86400000).toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-    }
-  }
-
-  return result as T[];
-}
-
 // Exportăm toate funcțiile într-un singur obiect
 export const dataLoader = {
   loadData,
   preloadData,
   invalidateCache,
   invalidateAllCache,
-  generateTestData,
 };
