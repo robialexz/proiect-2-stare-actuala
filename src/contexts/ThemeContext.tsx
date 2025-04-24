@@ -26,13 +26,42 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         .matches
         ? "dark"
         : "light";
+
+      // Setăm atributul data-theme
       root.setAttribute("data-theme", systemTheme);
+
+      // Actualizăm clasele pentru Tailwind
       root.classList.remove("light", "dark");
       root.classList.add(systemTheme);
+
+      // Aplicăm variabilele CSS pentru tema curentă
+      document.body.style.setProperty("--theme-applied", systemTheme);
+
+      // Actualizăm culoarea de fundal a documentului
+      document.body.style.backgroundColor =
+        systemTheme === "dark" ? "hsl(222, 47%, 11%)" : "hsl(0, 0%, 100%)";
+
+      // Actualizăm culoarea textului
+      document.body.style.color =
+        systemTheme === "dark" ? "hsl(0, 0%, 100%)" : "hsl(222, 47%, 11%)";
     } else {
+      // Setăm atributul data-theme
       root.setAttribute("data-theme", theme);
+
+      // Actualizăm clasele pentru Tailwind
       root.classList.remove("light", "dark");
       root.classList.add(theme);
+
+      // Aplicăm variabilele CSS pentru tema curentă
+      document.body.style.setProperty("--theme-applied", theme);
+
+      // Actualizăm culoarea de fundal a documentului
+      document.body.style.backgroundColor =
+        theme === "dark" ? "hsl(222, 47%, 11%)" : "hsl(0, 0%, 100%)";
+
+      // Actualizăm culoarea textului
+      document.body.style.color =
+        theme === "dark" ? "hsl(0, 0%, 100%)" : "hsl(222, 47%, 11%)";
     }
 
     localStorage.setItem("theme", theme);

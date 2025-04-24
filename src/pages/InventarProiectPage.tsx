@@ -70,8 +70,8 @@ import {
   Download,
   RefreshCw,
   Briefcase,
-  BarChart,
-  PieChart,
+  BarChart as BarChartIcon,
+  PieChart as PieChartIcon,
 } from "lucide-react";
 
 // Chart components
@@ -84,7 +84,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  PieChart as RechartsPieChart,
+  PieChart,
   Pie,
   Cell,
 } from "recharts";
@@ -101,7 +101,8 @@ const InventarProiectPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [selectedMaterial, setSelectedMaterial] = useState<MaterialWithProject | null>(null);
+  const [selectedMaterial, setSelectedMaterial] =
+    useState<MaterialWithProject | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [sortColumn, setSortColumn] = useState<string>("name");
@@ -123,24 +124,23 @@ const InventarProiectPage: React.FC = () => {
         setProjects(projectsData || []);
 
         // Fetch materials
-        const { data: materialsData, error: materialsError } = await supabase
-          .from("materials")
-          .select(`
-            id, 
-            name, 
-            dimension, 
-            unit, 
-            quantity, 
-            manufacturer, 
-            category, 
-            image_url, 
-            suplimentar, 
-            project_id, 
-            cost_per_unit, 
-            supplier_id, 
-            min_stock_level, 
-            max_stock_level, 
-            location, 
+        const { data: materialsData, error: materialsError } =
+          await supabase.from("materials").select(`
+            id,
+            name,
+            dimension,
+            unit,
+            quantity,
+            manufacturer,
+            category,
+            image_url,
+            suplimentar,
+            project_id,
+            cost_per_unit,
+            supplier_id,
+            min_stock_level,
+            max_stock_level,
+            location,
             notes,
             created_at,
             updated_at,
@@ -189,7 +189,9 @@ const InventarProiectPage: React.FC = () => {
     // First filter by project
     let filtered = materials;
     if (selectedProject) {
-      filtered = materials.filter((material) => material.project_id === selectedProject);
+      filtered = materials.filter(
+        (material) => material.project_id === selectedProject
+      );
     }
 
     // Then filter by search term
@@ -208,8 +210,10 @@ const InventarProiectPage: React.FC = () => {
       const bValue = b[sortColumn as keyof MaterialWithProject];
 
       // Handle null/undefined values
-      if (aValue === null || aValue === undefined) return sortDirection === "asc" ? -1 : 1;
-      if (bValue === null || bValue === undefined) return sortDirection === "asc" ? 1 : -1;
+      if (aValue === null || aValue === undefined)
+        return sortDirection === "asc" ? -1 : 1;
+      if (bValue === null || bValue === undefined)
+        return sortDirection === "asc" ? 1 : -1;
 
       // Compare based on type
       if (typeof aValue === "string" && typeof bValue === "string") {
@@ -238,10 +242,12 @@ const InventarProiectPage: React.FC = () => {
       categoryCounts[category] = (categoryCounts[category] || 0) + 1;
     });
 
-    const categoryData = Object.entries(categoryCounts).map(([name, value]) => ({
-      name,
-      value,
-    }));
+    const categoryData = Object.entries(categoryCounts).map(
+      ([name, value]) => ({
+        name,
+        value,
+      })
+    );
 
     // Materials by quantity
     const quantityData = filteredAndSortedMaterials
@@ -266,7 +272,7 @@ const InventarProiectPage: React.FC = () => {
       // In a real implementation, you would use a library like exceljs
       // For now, we'll just simulate the export
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       toast({
         title: "Export realizat cu succes",
         description: "Datele au fost exportate în format Excel.",
@@ -323,7 +329,18 @@ const InventarProiectPage: React.FC = () => {
   }
 
   // Colors for pie chart
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1', '#a4de6c', '#d0ed57'];
+  const COLORS = [
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#8dd1e1",
+    "#a4de6c",
+    "#d0ed57",
+  ];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -386,11 +403,11 @@ const InventarProiectPage: React.FC = () => {
             Listă Materiale
           </TabsTrigger>
           <TabsTrigger value="categorii">
-            <PieChart className="mr-2 h-4 w-4" />
+            <PieChartIcon className="mr-2 h-4 w-4" />
             Categorii
           </TabsTrigger>
           <TabsTrigger value="cantitati">
-            <BarChart className="mr-2 h-4 w-4" />
+            <BarChartIcon className="mr-2 h-4 w-4" />
             Cantități
           </TabsTrigger>
         </TabsList>
@@ -401,7 +418,10 @@ const InventarProiectPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Package className="mr-2 h-5 w-5" />
-                Materiale {selectedProject ? `- ${projects.find(p => p.id === selectedProject)?.name}` : ""}
+                Materiale{" "}
+                {selectedProject
+                  ? `- ${projects.find((p) => p.id === selectedProject)?.name}`
+                  : ""}
               </CardTitle>
               <CardDescription>
                 Lista materialelor din inventarul proiectului
@@ -430,7 +450,10 @@ const InventarProiectPage: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead onClick={() => handleSort("name")} className="cursor-pointer">
+                      <TableHead
+                        onClick={() => handleSort("name")}
+                        className="cursor-pointer"
+                      >
                         <div className="flex items-center">
                           Nume
                           {sortColumn === "name" && (
@@ -438,7 +461,10 @@ const InventarProiectPage: React.FC = () => {
                           )}
                         </div>
                       </TableHead>
-                      <TableHead onClick={() => handleSort("category")} className="cursor-pointer">
+                      <TableHead
+                        onClick={() => handleSort("category")}
+                        className="cursor-pointer"
+                      >
                         <div className="flex items-center">
                           Categorie
                           {sortColumn === "category" && (
@@ -446,7 +472,10 @@ const InventarProiectPage: React.FC = () => {
                           )}
                         </div>
                       </TableHead>
-                      <TableHead onClick={() => handleSort("quantity")} className="cursor-pointer text-right">
+                      <TableHead
+                        onClick={() => handleSort("quantity")}
+                        className="cursor-pointer text-right"
+                      >
                         <div className="flex items-center justify-end">
                           Cantitate
                           {sortColumn === "quantity" && (
@@ -478,10 +507,14 @@ const InventarProiectPage: React.FC = () => {
                     ) : (
                       filteredAndSortedMaterials.map((material) => (
                         <TableRow key={material.id}>
-                          <TableCell className="font-medium">{material.name}</TableCell>
+                          <TableCell className="font-medium">
+                            {material.name}
+                          </TableCell>
                           <TableCell>
                             {material.category ? (
-                              <Badge variant="outline">{material.category}</Badge>
+                              <Badge variant="outline">
+                                {material.category}
+                              </Badge>
                             ) : (
                               <span className="text-muted-foreground text-sm">
                                 Necategorizat
@@ -489,9 +522,17 @@ const InventarProiectPage: React.FC = () => {
                             )}
                           </TableCell>
                           <TableCell className="text-right">
-                            <span className={material.quantity <= (material.min_stock_level || 0) ? "text-destructive font-medium" : ""}>
+                            <span
+                              className={
+                                material.quantity <=
+                                (material.min_stock_level || 0)
+                                  ? "text-destructive font-medium"
+                                  : ""
+                              }
+                            >
                               {material.quantity}
-                              {material.quantity <= (material.min_stock_level || 0) && (
+                              {material.quantity <=
+                                (material.min_stock_level || 0) && (
                                 <AlertCircle className="inline ml-1 h-4 w-4 text-destructive" />
                               )}
                             </span>
@@ -507,11 +548,19 @@ const InventarProiectPage: React.FC = () => {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Acțiuni</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => handleViewDetails(material)}>
+                                <DropdownMenuItem
+                                  onClick={() => handleViewDetails(material)}
+                                >
                                   <Eye className="mr-2 h-4 w-4" />
                                   Vezi detalii
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => navigate(`/editeaza-material/${material.id}`)}>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    navigate(
+                                      `/editeaza-material/${material.id}`
+                                    )
+                                  }
+                                >
                                   <Edit className="mr-2 h-4 w-4" />
                                   Editează
                                 </DropdownMenuItem>
@@ -534,7 +583,11 @@ const InventarProiectPage: React.FC = () => {
               <div className="text-sm text-muted-foreground">
                 {filteredAndSortedMaterials.length} materiale găsite
               </div>
-              <Button variant="outline" size="sm" onClick={() => setSearchTerm("")}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSearchTerm("")}
+              >
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Resetează filtrele
               </Button>
@@ -547,7 +600,7 @@ const InventarProiectPage: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <PieChart className="mr-2 h-5 w-5" />
+                <PieChartIcon className="mr-2 h-5 w-5" />
                 Distribuție pe Categorii
               </CardTitle>
               <CardDescription>
@@ -558,29 +611,39 @@ const InventarProiectPage: React.FC = () => {
               <div className="h-[400px] w-full">
                 {chartData.categoryData.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                    <PieChart className="h-12 w-12 mb-2 opacity-20" />
+                    <PieChartIcon className="h-12 w-12 mb-2 opacity-20" />
                     <p>Nu există date pentru afișarea graficului</p>
                   </div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart>
+                    <PieChart>
                       <Pie
                         data={chartData.categoryData}
                         cx="50%"
                         cy="50%"
                         labelLine={true}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) =>
+                          `${name}: ${(percent * 100).toFixed(0)}%`
+                        }
                         outerRadius={150}
                         fill="#8884d8"
                         dataKey="value"
                       >
                         {chartData.categoryData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => [`${value} materiale`, 'Cantitate']} />
+                      <Tooltip
+                        formatter={(value) => [
+                          `${value} materiale`,
+                          "Cantitate",
+                        ]}
+                      />
                       <Legend />
-                    </RechartsPieChart>
+                    </PieChart>
                   </ResponsiveContainer>
                 )}
               </div>
@@ -593,7 +656,7 @@ const InventarProiectPage: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <BarChart className="mr-2 h-5 w-5" />
+                <BarChartIcon className="mr-2 h-5 w-5" />
                 Top Materiale după Cantitate
               </CardTitle>
               <CardDescription>
@@ -604,7 +667,7 @@ const InventarProiectPage: React.FC = () => {
               <div className="h-[400px] w-full">
                 {chartData.quantityData.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                    <BarChart className="h-12 w-12 mb-2 opacity-20" />
+                    <BarChartIcon className="h-12 w-12 mb-2 opacity-20" />
                     <p>Nu există date pentru afișarea graficului</p>
                   </div>
                 ) : (
@@ -669,7 +732,9 @@ const InventarProiectPage: React.FC = () => {
               {selectedMaterial.manufacturer && (
                 <div className="grid grid-cols-4 items-center gap-4">
                   <div className="font-medium">Producător:</div>
-                  <div className="col-span-3">{selectedMaterial.manufacturer}</div>
+                  <div className="col-span-3">
+                    {selectedMaterial.manufacturer}
+                  </div>
                 </div>
               )}
               {selectedMaterial.location && (
@@ -709,11 +774,18 @@ const InventarProiectPage: React.FC = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowDetailsDialog(false)}
+            >
               Închide
             </Button>
             {selectedMaterial && (
-              <Button onClick={() => navigate(`/editeaza-material/${selectedMaterial.id}`)}>
+              <Button
+                onClick={() =>
+                  navigate(`/editeaza-material/${selectedMaterial.id}`)
+                }
+              >
                 <Edit className="mr-2 h-4 w-4" />
                 Editează
               </Button>

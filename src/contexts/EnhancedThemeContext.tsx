@@ -130,6 +130,9 @@ export const EnhancedThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(effectiveTheme);
 
+    // Setăm atributul data-theme
+    document.documentElement.setAttribute("data-theme", effectiveTheme);
+
     // Actualizăm clasa pentru culoare
     document.documentElement.classList.remove(
       "theme-blue",
@@ -184,6 +187,64 @@ export const EnhancedThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         "content",
         effectiveTheme === "dark" ? "#0f172a" : "#ffffff"
       );
+    }
+
+    // Aplicăm variabilele CSS pentru tema curentă
+    document.body.style.setProperty("--theme-applied", effectiveTheme);
+
+    // Actualizăm culoarea de fundal a documentului
+    document.body.style.backgroundColor =
+      effectiveTheme === "dark" ? "hsl(222, 47%, 11%)" : "hsl(0, 0%, 100%)";
+
+    // Actualizăm culoarea textului
+    document.body.style.color =
+      effectiveTheme === "dark" ? "hsl(0, 0%, 100%)" : "hsl(222, 47%, 11%)";
+
+    // Actualizăm culorile pentru elementele de interfață
+    const rootStyle = document.documentElement.style;
+
+    if (effectiveTheme === "dark") {
+      // Setăm variabilele CSS pentru tema întunecată
+      rootStyle.setProperty("--background", "222 47% 11%");
+      rootStyle.setProperty("--foreground", "0 0% 100%");
+      rootStyle.setProperty("--card", "223 47% 14%");
+      rootStyle.setProperty("--card-foreground", "0 0% 100%");
+      rootStyle.setProperty("--popover", "223 47% 14%");
+      rootStyle.setProperty("--popover-foreground", "0 0% 100%");
+      rootStyle.setProperty("--primary", "234 89% 74%");
+      rootStyle.setProperty("--primary-foreground", "0 0% 100%");
+      rootStyle.setProperty("--secondary", "199 89% 48%");
+      rootStyle.setProperty("--secondary-foreground", "0 0% 100%");
+      rootStyle.setProperty("--muted", "223 47% 20%");
+      rootStyle.setProperty("--muted-foreground", "215 20% 65%");
+      rootStyle.setProperty("--accent", "262 83% 58%");
+      rootStyle.setProperty("--accent-foreground", "0 0% 100%");
+      rootStyle.setProperty("--destructive", "0 84% 60%");
+      rootStyle.setProperty("--destructive-foreground", "0 0% 100%");
+      rootStyle.setProperty("--border", "217 19% 27%");
+      rootStyle.setProperty("--input", "217 19% 27%");
+      rootStyle.setProperty("--ring", "224 76% 48%");
+    } else {
+      // Setăm variabilele CSS pentru tema luminoasă
+      rootStyle.setProperty("--background", "0 0% 100%");
+      rootStyle.setProperty("--foreground", "222 47% 11%");
+      rootStyle.setProperty("--card", "210 40% 98%");
+      rootStyle.setProperty("--card-foreground", "222 47% 11%");
+      rootStyle.setProperty("--popover", "0 0% 100%");
+      rootStyle.setProperty("--popover-foreground", "222 47% 11%");
+      rootStyle.setProperty("--primary", "234 89% 54%");
+      rootStyle.setProperty("--primary-foreground", "0 0% 100%");
+      rootStyle.setProperty("--secondary", "199 89% 38%");
+      rootStyle.setProperty("--secondary-foreground", "0 0% 100%");
+      rootStyle.setProperty("--muted", "210 40% 96%");
+      rootStyle.setProperty("--muted-foreground", "215 16% 47%");
+      rootStyle.setProperty("--accent", "262 83% 48%");
+      rootStyle.setProperty("--accent-foreground", "0 0% 100%");
+      rootStyle.setProperty("--destructive", "0 84% 60%");
+      rootStyle.setProperty("--destructive-foreground", "0 0% 100%");
+      rootStyle.setProperty("--border", "214 32% 91%");
+      rootStyle.setProperty("--input", "214 32% 91%");
+      rootStyle.setProperty("--ring", "224 76% 48%");
     }
   }, [theme, effectiveTheme]);
 

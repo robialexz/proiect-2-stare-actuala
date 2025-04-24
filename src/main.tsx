@@ -12,14 +12,12 @@ import { cleanSite, isSiteCleaned } from "./utils/clean-site";
 
 // Dezactivăm service worker-ul temporar pentru a rezolva problema de reîncărcare continuă
 
-
 //     navigator.serviceWorker
 //       .register("/service-worker.js")
 //       .then((registration) => {
 //         // Removed console statement
 //
 //         // Verificăm dacă există o versiune nouă a service worker-ului
-
 
 //           // Removed console statement
 //
@@ -63,7 +61,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { RoleProvider } from "./contexts/RoleContext";
 import { HelmetProvider } from "react-helmet-async";
 import { AdvancedRoleProvider } from "./contexts/AdvancedRoleContext";
-import { OfflineProvider } from "./contexts/OfflineContext";
+// Offline functionality has been removed
 import ErrorBoundary from "./components/ErrorBoundary";
 // Importăm sistemul de gestionare a erorilor
 import { errorRecovery } from "./lib/error-recovery";
@@ -74,8 +72,6 @@ import { routePreloader } from "./lib/route-preloader";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Dezactivăm temporar TempoDevtools pentru a îmbunătăți performanța
-
-
 
 // Preîncărcăm rutele și paginile frecvent accesate la pornirea aplicației
 routePreloader.preloadFrequentRoutes();
@@ -105,19 +101,17 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <AuthProvider>
             <RoleProvider>
               <AdvancedRoleProvider>
-                <OfflineProvider>
-                  {/* Adăugăm ThemeProvider înainte de EnhancedThemeProvider pentru a rezolva eroarea */}
-                  <ThemeProvider>
-                    <EnhancedThemeProvider>
-                      <EnhancedNotificationProvider>
-                        <NotificationProvider>
-                          <App />
-                          <Toaster />
-                        </NotificationProvider>
-                      </EnhancedNotificationProvider>
-                    </EnhancedThemeProvider>
-                  </ThemeProvider>
-                </OfflineProvider>
+                {/* Adăugăm ThemeProvider înainte de EnhancedThemeProvider pentru a rezolva eroarea */}
+                <ThemeProvider>
+                  <EnhancedThemeProvider>
+                    <EnhancedNotificationProvider>
+                      <NotificationProvider>
+                        <App />
+                        <Toaster />
+                      </NotificationProvider>
+                    </EnhancedNotificationProvider>
+                  </EnhancedThemeProvider>
+                </ThemeProvider>
               </AdvancedRoleProvider>
             </RoleProvider>
           </AuthProvider>
