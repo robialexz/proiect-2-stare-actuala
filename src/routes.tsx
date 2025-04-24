@@ -212,6 +212,10 @@ export function AppRoutes() {
         <Route path="inventar-companie" element={<InventarCompaniePage />} />
         <Route path="inventar-proiect" element={<InventarProiectPage />} />
         <Route
+          path="inventar-proiect/:projectId"
+          element={<InventarProiectPage />}
+        />
+        <Route
           path="company-inventory"
           element={<Navigate to="/inventar-companie" replace />}
         />

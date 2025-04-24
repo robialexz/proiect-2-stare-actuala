@@ -14,6 +14,7 @@ const frequentRoutes = [
   "/inventory-management",
   "/projects",
   "/inventar-companie",
+  "/inventar-proiect",
   "/suppliers",
   "/teams",
   "/reports",
@@ -26,6 +27,7 @@ const routeComponents: Record<string, () => Promise<any>> = {
   "/inventory-management": () => import("../pages/InventoryManagementPage"),
   "/projects": () => import("../pages/ProjectsPage"),
   "/inventar-companie": () => import("../pages/InventarCompaniePage"),
+  "/inventar-proiect": () => import("../pages/InventarProiectPage"),
   "/suppliers": () => import("../pages/SuppliersPageNew"),
   "/suppliers/:supplierId": () => import("../pages/SupplierDetailsPage"),
   "/teams": () => import("../pages/TeamsPage"),
@@ -49,6 +51,7 @@ const groupComponents: Record<RouteGroup, Array<() => Promise<any>>> = {
     () => import("../pages/InventoryManagementPage"),
     () => import("../pages/InventoryOverviewPage"),
     () => import("../pages/InventarCompaniePage"),
+    () => import("../pages/InventarProiectPage"),
   ],
   [RouteGroup.PROJECTS]: [() => import("../pages/ProjectsPage")],
   [RouteGroup.AUTH]: [
@@ -119,6 +122,12 @@ export const preloadComponent = (componentPath: string): void => {
           // Removed console statement
         });
         break;
+      case "ProjectInventory":
+      case "InventarProiect":
+        import("../pages/InventarProiectPage").catch((err) => {
+          // Removed console statement
+        });
+        break;
       default:
       // Removed console statement
     }
@@ -175,6 +184,7 @@ export const preloadFrequentPages = (): void => {
     "InventoryManagementPage",
     "ProjectsPage",
     "InventarCompaniePage",
+    "InventarProiectPage",
   ];
 
   preloadPages(frequentPages);
